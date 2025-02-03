@@ -24,7 +24,7 @@ footer      : "JLC - 4PRJ1D"
 # Objectifs pédagogiques
 
 - **Analyser** les exigences et **planifier** le développement du projet.
-- **Concevoir**, **développer** et développer** une application complète.
+- **Concevoir**, **développer** et **tester** une application complète.
 - **Justifier** ses choix techniques et proposer des améliorations.
 - **Critiquer** de manière réfléchie son analyse à la fin du développement,
 
