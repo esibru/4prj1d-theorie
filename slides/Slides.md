@@ -81,10 +81,46 @@ Utilisation de fichiers FXML
 
 # Une approche déclarative pour JavaFX
 
+<div class="columns">
+
+<div>
+
 - Séparation entre logique et interface utilisateur
 - Facilite la collaboration entre développeurs et designers
 - Lisibilité améliorée du code
 - Réutilisation et modularité
+
+</div>
+
+<div>
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.Button?>
+
+<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+    </padding>
+
+    <Label text="Bonjour, FXML!" />
+    <Button text="Cliquez-moi" onAction="#onHelloButtonClick"/>
+
+</VBox>
+```
+
+<figcaption align="center">
+<b>Code</b>: FXML Hello World.
+</figcaption>
+
+</div>
+
+</div>
 
 ---
 
@@ -102,7 +138,7 @@ Exemple :
     <Button text="Cliquez-moi" />
 </VBox>
 ```
-> **Note** : Un espace de noms XML (`xmlns`) est une recommandation du W3C qui permet d'employer des éléments et des attributs nommés dans une instance XML. 
+
 ---
 
 # Balises et équivalence avec JavaFX
@@ -121,72 +157,294 @@ vbox.getChildren().addAll(label, button);
 
 ---
 
+# Transformation d'une balise VBox
+
+- On peut enrichir cette balise avec des attributs pour mieux contrôler l'affichage :
+    - `alignment="CENTER"` : Centre les éléments à l'intérieur de la VBox.
+    - `spacing="20.0"` : Définit un espacement de 20 pixels entre les éléments.
+
+
+<div class="columns">
+
+<div>
+
+### FXML
+
+```xml
+<VBox alignment="CENTER" 
+      spacing="20.0" 
+      xmlns:fx="http://javafx.com/fxml">
+```
+
+</div>
+<div>
+
+### Equivalent Java
+
+```java
+VBox vbox = new VBox();
+vbox.setAlignment(Pos.CENTER);
+vbox.setSpacing(20.0);
+```
+</div>
+</div>
+
+---
+
+# Import et première balise en FXML
+
+- Un fichier FXML commence toujours par une balise de conteneur racine : la **root** .
+- La root est de type `VBox` dans l'exemple.
+- L'attribut `xmlns` est obligatoire et définit l'espace de noms XML utilisé.
+- L'attribut `xmlns:fx` est utilisé pour les fonctionnalités spécifiques à JavaFX.
+
+Exemple :
+```xml
+<VBox xmlns="http://javafx.com/javafx" 
+      xmlns:fx="http://javafx.com/fxml">
+```
+
+- On doit importer des classes Java directement dans FXML :
+```xml
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+```
+---
+
+# Déclaration XML en FXML
+
+- Chaque fichier FXML commence par une déclaration XML standard.
+- Cette déclaration spécifie la version XML et l'encodage utilisé.
+- Obligatoire pour assurer la compatibilité avec les analyseurs XML.
+
+Exemple :
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+```
+- `version="1.0"` : Définit la version XML utilisée.
+- `encoding="UTF-8"` : Spécifie l'encodage des caractères, essentiel pour la prise en charge des accents et caractères spéciaux.
+
+---
+
+# Dépendances Maven pour JavaFX et FXML
+
+Dans le fichier `pom.xml`, ajoutez les dépendances suivantes :
+```xml
+<dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-controls</artifactId>
+    <version>17</version>
+</dependency>
+<dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-fxml</artifactId>
+    <version>17</version>
+</dependency>
+```
+
+- `javafx-controls` : Contient les composants UI JavaFX
+- `javafx-fxml` : Permet d'utiliser FXML dans l'application
+
+---
+
 # SceneBuilder : Interface graphique pour créer du FXML
+
+<div class="columns-center">
+<div>
+
+<center>
+
+![](./img/scenebuilder.png)
+
+<figcaption align="center">
+<b>Figure</b>: Scene Builder.
+</figcaption>
+</center>
+
+</div>
+<div>
 
 - Permet de générer du FXML visuellement
 - Facile d'utilisation pour les non-développeurs
 - Génère automatiquement les IDs et méthodes associées
+
+</div>
+</div>
+
+---
+
+# Structure d'un projet Maven avec FXML - Version 1
+
+```
+my-javafx-app/
+│-- src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/example/app/
+│   │   │       ├── Main.java
+│   │   ├── resources/
+│   │   │   └── com/example/app/
+│   │   │       ├── view.fxml
+│-- pom.xml
+```
+- `Main.java` : Classe principale pour lancer l'application JavaFX.
+- `view.fxml` : Définit l'interface graphique.
 
 ---
 
 # Charger un fichier
 
 ```java
-public void start(Stage stage) throws IOException {
-    URL resource = Main.class.getResource("hello-view.fxml");
-    FXMLLoader fxmlLoader = new FXMLLoader(resource);
-    Scene scene = new Scene(fxmlLoader.load(), 640, 800);
-    stage.setTitle("Hello!");
-    stage.setScene(scene);
-    stage.show();
+public class Main extends Application {
+    @Override
+    public void start(Stage stage) throws IOException {
+        URL resource = Main.class.getResource("hello-view.fxml");
+        FXMLLoader loader = new FXMLLoader(resource);
+        Parent root = loader.load();
+        Scene scene = new Scene(root, 640, 800);
+        stage.setTitle("Hello!");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public static void main(String[] args) {
+        launch();
+    }
 }
 ```
 
 ---
 
-# Contrôleur et gestion des événements
+# Une nouvelle classe : le Contrôleur FXML
 
 - Lien entre FXML et logique Java
 - Utilisation de `FXMLLoader` pour charger le fichier FXML
 - Annotation `@FXML` pour lier les composants
+- `@FXML` est utilisé pour injecter l'élément défini dans le fichier FXML.
 - Gestion des événements avec `EventHandler`
 
-Exemple :
-```java
-@FXML
-private Button myButton;
+---
 
-@FXML
-private void handleButtonClick() {
-    System.out.println("Bouton cliqué !");
+# Structure d'un projet Maven avec FXML - Version 2
+
+```
+my-javafx-app/
+│-- src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/example/app/
+│   │   │       ├── Main.java
+│   │   │       ├── FxmlController.java
+│   │   ├── resources/
+│   │   │   └── com/example/app/
+│   │   │       ├── view.fxml
+│-- pom.xml
+```
+- `Main.java` : Classe principale pour lancer l'application JavaFX.
+- `Controller.java` : Gère la logique associée aux événements FXML.
+- `view.fxml` : Définit l'interface graphique.
+
+---
+
+# Utilisation de `fx:id`
+
+- `fx:id` permet d'identifier un élément du fichier FXML pour y accéder dans le contrôleur.
+
+### Exemple :
+```xml
+<VBox xmlns:fx="http://javafx.com/fxml">
+    <Button fx:id="myButton" text="Cliquez-moi"/>
+</VBox>
+```
+
+### Accès en Java :
+```java
+public class Controller {
+    @FXML
+    private Button myButton;
+}
+```
+
+
+---
+
+# Utilisation de `fx:controller`
+
+`fx:controller` spécifie la classe Java qui gère la logique de l'interface.
+
+### Exemple :
+```xml
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.FxmlController">
+    <Button fx:id="myButton" text="Cliquez-moi"/>
+</VBox>
+```
+
+### Accès en Java :
+```java
+public class FxmlController {
+    @FXML
+    private Button myButton;
+}
+```
+---
+
+# La méthode `initialize()` du contrôleur
+
+- La méthode `initialize()` est automatiquement appelée **après l'instanciation** du contrôleur.
+- Elle permet d'initialiser des composants.
+
+### Exemple :
+```java
+public class FxmlController {
+    @FXML private Label label;
+
+    public void initialize() {
+        label.setText("Bienvenue dans l'application!");
+    }
 }
 ```
 
 ---
+# Notions avancées : `TableView` et `ObservableList`
 
-# Observable List
+- Une `ObservableList` est une liste dynamique qui permet de notifier les changements à l'interface utilisateur.
+- Utile pour gérer des données affichées dans des composants comme `TableView`.
+- `TableView` est un composant permettant d'afficher des données tabulaires.
 
-- Liste dynamique qui notifie les changements
-- Utilisée dans JavaFX pour des éléments dynamiques
+---
 
-Exemple :
-```java
-ObservableList<String> items = FXCollections.observableArrayList("Item 1", "Item 2");
-listView.setItems(items);
+# Déclaration d'un `TableView` en FXML
+
+```xml
+<TableView fx:id="personTable" xmlns:fx="http://javafx.com/fxml">
+    <columns>
+        <TableColumn text="Nom" fx:id="nameColumn" />
+        <TableColumn text="Âge" fx:id="ageColumn" />
+    </columns>
+</TableView>
 ```
 
 ---
 
-# TableView en JavaFX
+# Contrôleur associé à une `TableView` en FXML
 
-- Tableaux dynamiques avec colonnes et données
-- Utilisation d'`ObservableList` pour mise à jour automatique
-
-Exemple :
 ```java
-TableView<Person> table = new TableView<>();
-TableColumn<Person, String> nameCol = new TableColumn<>("Nom");
-table.getColumns().add(nameCol);
+public class FxmlController {
+    @FXML private TableView<Person> personTable;
+    @FXML private TableColumn<Person, String> nameColumn;
+    @FXML private TableColumn<Person, Integer> ageColumn;
+
+    public void initialize() {
+        ObservableList<String> items = 
+            FXCollections.observableArrayList(person1, person2);
+        nameColumn.setCellValueFactory(
+            new PropertyValueFactory<>("name"));
+        ageColumn.setCellValueFactory(
+            new PropertyValueFactory<>("age"));
+        personTable.setItems(items);
+    }
+}
 ```
 
 ---
@@ -207,7 +465,7 @@ comboBox.getItems().addAll("Option 1", "Option 2");
 # Navigation entre vues et patterns
 
 - Utilisation de `FXMLLoader` pour charger dynamiquement les vues
-- Patterns recommandés : **MVC** ou **Singleton Controller**
+- Patterns recommandés : **MVC** ou ses variants
 
 Exemple de changement de scène :
 ```java
@@ -217,20 +475,63 @@ stage.setScene(new Scene(newView));
 
 ---
 
-# FXML et CSS
+# FXML et CSS dans `src/main/java/resources`
 
-- Personnalisation avec des styles CSS
-- Ajout via `setStylesheet` ou fichier `.css`
+<div class="columns" align="center">
+<div>         
 
-Exemple :
+## styles.css
+
 ```css
+.root {
+    -fx-background-color: lightgray;
+}
+
 .button {
-    -fx-background-color: #2a5298;
+    -fx-background-color: blue;
     -fx-text-fill: white;
 }
 ```
+   
+</div>
+<div>
 
+## hello-world.fxml
+
+```xml
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      stylesheets="@styles.css">
+    <Button text="Bouton Stylisé" 
+            styleClass="button"/>
+</VBox>
+```
+
+</div>
+</div>
+
+- `stylesheets="@styles.css"` : Charge le fichier CSS.
+- `styleClass="button"` : Applique la classe CSS définie.
 --- 
+
+# Structure d'un projet Maven avec FXML - Version 3
+
+```
+my-javafx-app/
+│-- src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/example/app/
+│   │   │       ├── Main.java
+│   │   │       ├── FxmlController.java
+│   │   ├── resources/
+│   │   │   └── com/example/app/
+│   │   │       ├── view.fxml
+│   │   │       ├── styles.css
+│   │   │       ├── images/
+│-- pom.xml
+```
+---
 
 <!-- _class: biblio -->
 
