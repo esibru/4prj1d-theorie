@@ -563,13 +563,540 @@ OpenJFX. **Référence CSS JavaFX**. Consulté le 1er février 2025. [https://op
 Programmation concurrente<br>
 Les threads en java
 
---- 
 
-<div>         
+---
+
+# Introduction
+
+<div class="columns">
+<div>
+
+<center>
+
+![h:450](./img/thread-intro.jpg)
+
+</center>
+
+</div>
+<div>
+
+
+### Définition
+- Un **thread** est une unité d'exécution au sein d'un processus.
+- Permet l'exécution parallèle de tâches.
+
+### Avantages du multithreading en Java
+- **Meilleure utilisation des ressources**.
+- **Réduction du temps d'attente** pour certaines tâches.
+- **Amélioration de la réactivité** des applications.
+
+</div>
+</div>
+
+---
+
+# Le cycle de vie d'un thread
+
+<div class="center">         
  
-![h:450px](./img/work-in-progress.jpeg)
+![h:450px](./img/thread-lifecycle.png)
    
 </div> 
+
+---
+
+# Création d'un Thread
+
+<!-- _class: cool-list -->
+
+1. *Héritage de la classe Thread*
+2. *Implémentation de l'interface Runnable*
+3. *Composition via un attribut Thread*
+
+---
+
+# Création d'un Thread
+
+<div class="columns">
+<div>
+
+<center>
+
+![h:400](./img/thread-sequence-heritage.png)
+
+</center>
+
+</div>
+<div>
+
+## Héritage de la classe Thread
+
+```java
+class MyThread extends Thread {
+    public void run() {
+        System.out.println("Thread en cours d'exécution");
+    }
+}
+
+MyThread t = new MyThread();
+t.start();
+```
+
+</div>
+</div>
+
+> [Lien vers les codes exemples utilisés lors de la présentation](https://git.esi-bru.be/4prj1d-ressources/demo-thread)
+---
+
+
+# Création d'un Thread
+
+<div class="columns">
+<div>
+
+<center>
+
+![h:400](./img/thread-sequence-runnable.png)
+
+</center>
+
+</div>
+<div>
+
+## Implémentation de l'interface Runnable
+
+```java
+class MyRunnable implements Runnable {
+    public void run() {
+        System.out.println("Thread en cours d'exécution");
+    }
+}
+
+Thread t = new Thread(new MyRunnable());
+t.start();
+```
+
+</div>
+</div>
+
+---
+
+
+# Création d'un Thread
+
+<div class="columns">
+<div>
+
+<center>
+
+![h:400](./img/thread-sequence-composition.png)
+
+</center>
+
+</div>
+<div>
+
+## Composition via un attribut
+
+```java
+public class MyThreadComposition {
+
+    private Thread thread;
+
+    public MyThreadComposition() {
+        thread = new Thread(new MyRunnable());
+    }
+
+    public void start() {
+        thread.start();
+    }
+
+}
+```
+
+</div>
+</div>
+
+---
+
+# Différences entre la méthode start et run
+
+- `start()` : démarre l'exécution du thread. Lorsqu'elle est appelée, elle appelle automatiquement la méthode `run()`, mais dans un nouveau thread d'exécution.
+
+- `run()` : méthode qui contient le code à exécuter dans le thread. Si vous définissez une classe qui implémente Runnable ou étend Thread, vous redéfinissez cette méthode pour spécifier ce que doit faire le thread. Si vous appelez directement `run()`, le code sera exécuté dans le thread principal, pas dans un nouveau thread.
+
+---
+
+# Threads Démon
+
+Un **thread démon** s'exécute en arrière-plan et ne bloque pas la fermeture de l'application.
+
+```java
+Thread daemonThread = new Thread(() -> {
+    while (true) {
+        System.out.println("Daemon thread en cours");
+    }
+});
+
+daemonThread.setDaemon(true);
+daemonThread.start();
+```
+
+---
+
+# Attendre la fin d'un Thread avec la méthode `join()`
+
+<div class="columns">
+<div>
+
+
+```java
+public class MonThread extends Thread {
+
+    @Override
+    public void run() {
+
+        try {
+
+            System.out.println("Le thread commence");
+
+            // Simuler un travail en suspendant 
+            // le thread  pendant 2 secondes
+            Thread.sleep(2000);
+
+            System.out.println("Le thread se " +
+              " termine après 2 secondes.");
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+
+
+```
+
+</div>
+<div>
+
+
+```java
+public static void main(String[] args) {
+
+    MonThread monThread = new MonThread();
+    monThread.start();
+
+    try {
+
+        System.out.println(
+          "Main attend la fin du thread");
+
+        monThread.join();
+
+        System.out.println(
+          "Main reprend après la fin du thread");
+
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+
+    System.out.println(
+      "Le programme principal se termine.");
+}
+```
+
+</div>
+</div>
+
+---
+
+
+# Quelle est la valeur affichée ?
+
+<div class="columns">
+<div>
+
+
+```java
+public class MonCompteur
+    implements Runnable {
+
+    // Variable partagée entre les threads
+    private static int compteur = 0;
+
+    private void incrementer() {
+        compteur++;
+    }
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 1000; i++) {
+            incrementer();
+        }
+    }
+}
+```
+
+</div>
+<div>
+
+
+```java
+public static void main(String[] args) 
+    throws InterruptedException {
+
+    MonCompteur monCompteur = new MonCompteur();
+    Thread t1 = new Thread(monCompteur);
+    Thread t2 = new Thread(monCompteur);
+
+    // Démarrer les threads
+    t1.start();
+    t2.start();
+
+    // Attendre la fin des deux threads
+    t1.join();
+    t2.join();
+
+    // Afficher la valeur finale du compteur
+    System.out.println(
+        "Valeur du compteur : " + compteur);
+}
+```
+
+</div>
+</div>
+
+
+---
+
+# Synchronisation et gestion de la concurrence
+
+#### Méthode synchronisée
+
+L'accès à cette méthode est limité à un seul thread à la fois.
+
+```java
+private synchronized void incrementer() {
+    compteur++;
+}
+```
+
+--- 
+
+# Synchronisation et gestion de la concurrence
+
+#### Bloc synchronisé
+
+```java
+public void incrementer() {
+    // Code non synchronisé
+    //avant le bloc
+    
+    // Bloc synchronisé
+    synchronized(this) {
+        compteur++;
+    }
+}
+```
+
+--- 
+
+# Synchronisation et gestion de la concurrence
+
+#### Synchronisation sur des objets spécifiques
+
+```java
+public class MonCompteur
+    implements Runnable {
+
+    private static int compteur = 0;
+
+    private final Object verrou = new Object();  // Un objet pour le verrouillage
+
+    public void incrementer() {
+        synchronized(verrou) {
+            compteur++;
+        }
+    }
+}
+```
+
+---
+
+
+# L'étreinte mortelle - Deadlock
+
+<div class="columns">
+<div>
+
+<center>
+
+![h:400](./img/thread-deadlock.png)
+
+</center>
+
+</div>
+<div>
+
+1. **Thread1** acquiert **Ressource1** et dort pendant 100 ms.
+2. **Thread2** acquiert **Ressource2** et dort pendant 100 ms.
+3. **Thread1** essaie de récupérer **Ressource2**, mais elle est déjà occupée par **Thread2**. **Thread1** se bloque en attendant.
+4. **Thread2** essaie de récupérer **Ressource1**, mais elle est déjà occupée par **Thread1**. **Thread2** se bloque également en attendant.
+5. Résultat : les deux threads sont **bloqués indéfiniment**, créant une **impasse** ou **deadlock**.
+
+</div>
+</div>
+
+
+---
+
+
+# Structures **thread-safe**
+
+
+
+Structures de données conçues pour être utilisées en toute sécurité dans des environnements multithreads sans nécessiter de synchronisation externe.
+
+
+<!-- _class: cool-list -->
+
+Exemples : 
+
+1. *SynchronizedList, SynchronizedSet, SynchronizedMap*
+1. *ConcurrentSkipListMap, ConcurrentSkipListSet*
+1. *CopyOnWriteArrayList, CopyOnWriteArraySet*
+1. *Vector*
+
+
+
+---
+
+# Lister les Threads
+
+`Thread.getAllStackTraces()` retourne les threads en cours d'exécution.
+
+| **Nom du Thread**      | **Rôle** |
+|------------------------|----------|
+| `main`                | Le thread principal qui exécute la méthode `main()` |
+| `Reference Handler`   | Gère les références|
+| `Finalizer`           | Appelle la méthode `finalize()` |
+| `Signal Dispatcher`   | Gère les signaux du système d'exploitation |
+
+> Remarque : Le nombre exact peut varier selon la version de la JVM et l'environnement d'exécution.
+
+---
+
+# Threads et JavaFX
+
+- **Main Thread** démarre l'application.
+- **JavaFX Application Thread** gère l'UI.
+- Exception `IllegalStateException` si mise à jour hors du JavaFX Thread.
+
+
+---
+
+# Threads et JavaFX
+
+### Solution avec `Platform.runLater()`
+```java
+Platform.runLater(() -> label.setText("Mise à jour UI"));
+```
+
+---
+
+# Threads et JavaFX
+
+### Solution avec un Task<Void>
+```java
+Task<Void> task = new Task<>() {
+        @Override
+        protected Void call() throws Exception {
+            label.setText("Mise à jour UI")
+            return null;
+        }
+    };
+
+// Liaison des propriétés du Task avec l'UI
+label.textProperty().bind(task.messageProperty());
+```
+
+---
+
+# Design Pattern Thread pool
+
+## Principe
+
+- Un nombre fixe ou dynamique de threads est maintenu dans un **pool**.
+- Des tâches sont placées dans une file d'attente.
+- Les threads du pool prennent et exécutent les tâches disponibles.
+- Une fois une tâche terminée, le thread devient à nouveau disponible pour une nouvelle tâche
+
+---
+
+
+# Design Pattern Thread pool
+
+<div class="columns">
+<div>
+
+<center>
+
+![h:400](./img/threadpool-sequence.png)
+
+</center>
+
+</div>
+<div>
+
+```java
+public static void main(String[] args) {
+    // Création d'un pool de 3 threads
+    ExecutorService executor = 
+        Executors.newFixedThreadPool(3);
+
+    // Soumission de 5 tâches au pool
+    for (int i = 1; i <= 5; i++) {
+        final int taskId = i;
+        executor.submit(() -> {
+            System.out.println("Tâche " + taskId + 
+                " exécutée par " + 
+                Thread.currentThread().getName());
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException ignored) {}
+        });
+    }
+
+    executor.shutdown();
+}
+```
+
+</div>
+</div>
+
+
+---
+
+# JDK 21+ introduction des Virtual Threads
+
+**Plus légers** et **scalables**.
+
+```java
+public static void main(String[] args) {
+    Thread.startVirtualThread(() -> {
+        System.out.println("Virtual Thread exécuté par : " + Thread.currentThread());
+        try {
+            Thread.sleep(1000); // Simulation d'un traitement
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        System.out.println("Fin du Virtual Thread : " + Thread.currentThread());
+    });
+
+    System.out.println("Thread principal terminé : " + Thread.currentThread());
+}
+```
 
 ---
 <!-- _class: transition2 -->  
