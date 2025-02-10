@@ -721,9 +721,9 @@ public class MyThreadComposition {
 
 # Différences entre la méthode start et run
 
-- `start()` : démarre l'exécution du thread. Lorsqu'elle est appelée, elle appelle automatiquement la méthode `run()`, mais dans un nouveau thread d'exécution.
+- `start()` : démarre l'exécution du thread, elle appelle **automatiquement** la méthode `run()` dans un **nouveau thread** d'exécution.
 
-- `run()` : méthode qui contient le code à exécuter dans le thread. Si vous définissez une classe qui implémente Runnable ou étend Thread, vous redéfinissez cette méthode pour spécifier ce que doit faire le thread. Si vous appelez directement `run()`, le code sera exécuté dans le thread principal, pas dans un nouveau thread.
+- `run()` : méthode qui contient le code à exécuter dans le thread. Si vous définissez une classe qui **implémente Runnable** ou **étend Thread**, vous redéfinissez cette méthode pour spécifier ce que doit faire le thread. Si vous appelez directement `run()`, le code sera exécuté dans le thread principal, pas dans un nouveau thread.
 
 ---
 
