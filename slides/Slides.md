@@ -927,16 +927,20 @@ public class MonCompteur
 
 # L'étreinte mortelle - Deadlock
 
-<div class="columns">
-<div>
+<!-- <div class="columns">
+<div> -->
 
 <center>
 
 ![h:400](./img/thread-deadlock.png)
 
+<figcaption align="center">
+Vision séquentielle des accès aux ressources, en réalité les actions sont concourantes.
+</figcaption>
+
 </center>
 
-</div>
+<!-- </div>
 <div>
 
 1. **Thread1** acquiert **Ressource1** et dort pendant 100 ms.
@@ -946,7 +950,7 @@ public class MonCompteur
 5. Résultat : les deux threads sont **bloqués indéfiniment**, créant une **impasse** ou **deadlock**.
 
 </div>
-</div>
+</div> -->
 
 
 ---
@@ -991,17 +995,63 @@ Exemples :
 
 - **Main Thread** démarre l'application.
 - **JavaFX Application Thread** gère l'UI.
-- Exception `IllegalStateException` si mise à jour hors du JavaFX Thread.
+- Une exception est lancée si une mise à jour est effectuée hors du **JavaFX Application Thread**,
 
+```java
+Exception in thread "Thread-XX" java.lang.IllegalStateException:
+Not on FX application thread; currentThread = Thread-XX
+```
 
 ---
 
 # Threads et JavaFX
 
 ### Solution avec `Platform.runLater()`
+
+<div class="columns">
+<div>
+
 ```java
-Platform.runLater(() -> label.setText("Mise à jour UI"));
+button.setOnAction(event -> {
+    new Thread(() -> {
+        try {
+            Thread.sleep(2000);
+
+            label.setText("Traitement "
+                + " terminé !");  
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }).start();
+});
+
 ```
+
+</div>
+<div>
+
+
+```java
+button.setOnAction(event -> {
+    new Thread(() -> {
+        try {
+            Thread.sleep(2000);
+
+            Platform.runLater(()-> 
+              label.setText("Traitement "
+              + " terminé !"));
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }).start();
+});
+```
+
+</div>
+</div>
+
 
 ---
 
