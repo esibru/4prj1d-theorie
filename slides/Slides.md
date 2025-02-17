@@ -1165,16 +1165,1090 @@ Asynchronous Programming in Java using Virtual Threads. **Venkat Subramaniam**. 
 ---
 <!-- _class: transition2 -->  
 
-Design Pattern Repository<br>
-JDBC et JPA
+Principes SOLID</br>
+&</br>
+Design patterns
 
 --- 
 
+<!-- _class: cite -->        
+
+**SOLID** est un ensemble de principes pour améliorer la conception logicielle en **Programmation Orientée Objet**.
+
+---
+
+# Principe SOLID
+
+5 principes introduits par Robert C. Martin
+
+- **S**ingle responsibility principle - Responsabilité unique 
+- **O**pen–closed principle - Ouvert/fermé
+- **L**iskov substitution principle - Substitution de Liskov 
+- **I**nterface segregation principle - Ségrégation des interfaces 
+- **D**ependency inversion principle - Inversion des dépendances
+
+---
+
+# **S**ingle Responsibility Principle - SRP
+
+Une **classe**, une **fonction** ou une **méthode** doit avoir une et une seule **unique** raison d'être modifiée. 
+
+Cela favorise la modularité et facilite la maintenance en évitant les classes surchargées de responsabilités.
+
+---
+# **S**RP - Exemple sur une classe
+
+<div class="columns">
 <div>         
- 
-![h:450px](./img/work-in-progress.jpeg)
-   
+
+
+```java
+class Report {
+
+    private String content;
+
+    public void generate() {
+        content = "Rapport de ventes\n
+           ================\nTotal: 5000€\n";
+    }
+
+    public void saveToFile(String filename) {
+        try (FileWriter writer 
+                 = new FileWriter(filename)) {
+            writer.write(content);
+            System.out.println("Report saved to " 
+                + filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
 </div> 
+<div>
+
+### La classe a deux responsabilités :
+
+1. Générer le rapport (logique métier)
+2. Sauvegarder le fichier (interaction avec le système de fichiers)
+
+</div>
+</div>
+
+---
+# **S**RP - Exemple sur une classe
+
+<div class="columns">
+<div>         
+
+
+```java
+public class FileSaver {
+    public void saveToFile(String data,
+                          String filename) {
+        try (FileWriter writer 
+               = new FileWriter(filename)) {
+            writer.write(data);
+            System.out.println(
+                "Report saved to " 
+                + filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+public class Report {
+    private String content;
+
+    public void generate() {
+        content = "Rapport de ventes\n
+            ================\nTotal: 5000€\n";
+    }
+
+    public String getContent() {
+        return content;
+    }
+}
+```
+</div>
+</div>
+
+- `Report` génère le rapport (logique métier)
+- `FileSaver` sauvegarde le fichier (interaction avec le système de fichiers)
+
+---
+
+# **S**RP en lien avec le pattern Facade
+
+
+<div class="columns">
+<div>         
+
+```java
+public class ReportFacade {
+    private Report report;
+    private FileSaver saver;
+
+    public ReportFacade() {
+        this.report = new Report();
+        this.saver = new FileSaver();
+    }
+
+    public void generateAndSaveReport(
+            String filename) {
+
+        report.generate();
+        saver.saveToFile(
+            report.getContent(),
+                        filename); 
+    }
+}
+```
+
+</div> 
+<div>
+
+Le design pattern Facade fournit une interface simplifiée et unifiée pour **cacher la complexité** d'un sous-système, en **déléguant** les appels aux classes internes sans les exposer directement.
+
+`ReportFacade` **coordonne** les deux services.
+
+</div>
+</div>
+
+---
+
+# **S**RP - Exemple sur une méthode
+
+<div class="columns">
+<div>         
+
+### Deux responsabilités par méthode
+
+```java
+void displayWinner(List<Player> players, 
+         Player currentPlayer) {
+
+    Player winner = currentPlayer;
+
+    for (Player player : players) {
+        if(player.getScore()> 100){
+            winner = player;
+        }
+    }
+
+    System.out.println("Vainqueur : " 
+        + winner.getName());
+}
+```
+
+</div> 
+<div>
+
+### Une responsabilité par méthode
+
+```java
+Player getWinner(List<Player> players, 
+         Player currentPlayer) {
+    Player winner = currentPlayer;
+    for (Player player : players) {
+        if (player.getScore() > 100) {
+            winner = player;
+        }
+    }
+    return winner;
+}
+
+void displayWinner(Player player){
+    System.out.println("Vainqueur : " 
+        + winner.getName());
+}
+```
+
+</div>
+</div>
+
+---
+
+# **O**pen/Closed Principle
+
+Une classe (ou une fonction, un module ...) doit être **fermée** à la **modification** directe mais **ouverte** à l'**extension**. 
+
+L'objectif est de permettre l'ajout de nouvelles fonctionnalités **sans altérer le code existant**.
+
+---
+
+# **O**pen/Closed Principle - Exemple
+
+<div class="columns">
+<div>         
+
+
+```java
+public class PaymentProcessor {
+
+    public void processPayment(String type) {
+
+        if (type.equals("credit_card")) {
+
+            System.out.println(
+               "Processing card payment...");
+
+        } else if (type.equals("payconiq")) {
+
+            System.out.println(
+               "Processing Payconiq payment...");
+               
+        }
+    }
+} 
+```
+
+</div> 
+<div>
+
+Pour ajouter le Bitcoin comme moyen de paiement, il faut modifier `PaymentProcessor`.
+
+Si une classe a été **testée** et **validé**, on ne la **modifie pas**.
+</div>
+</div>
+
+---
+
+# **O**pen/Closed Principle en lien avec le pattern Strategy
+
+<div class="columns">
+<div>         
+
+```java
+interface PaymentStrategy {
+    void pay();
+}
+
+class CreditCardPayment implements PaymentStrategy {
+    public void pay() {
+
+        System.out.println(
+            "Processing credit card payment...");
+
+    }
+}
+
+class PayconiqPayment implements PaymentStrategy {
+    public void pay() {
+
+        System.out.println(
+            "Processing Payconiq payment...");
+
+    }
+}
+```
+
+</div> 
+<div>
+
+Pour ajouter un nouveau moyen de paiement il faut créer une nouvelle implémentation de `PaymentStrategy`.
+
+Le design pattern Strategy permet de définir une **famille d'algorithmes**, de les **encapsuler** et de les **interchanger dynamiquement** sans modifier le code du client, favorisant ainsi l'extensibilité.
+</div>
+</div>
+
+---
+
+# **O**pen/Closed Principle en lien avec le pattern Strategy
+
+<div class="columns">
+<div>         
+
+```java
+public class PaymentProcessor {
+    private PaymentStrategy strategy;
+
+    public PaymentProcessor(
+             PaymentStrategy strategy) {
+
+        this.strategy = strategy;
+    }
+
+    public void processPayment() {
+        strategy.pay();
+    }
+
+    public void setStrategy(
+            PaymentStrategy strategy) {
+        this.strategy = strategy;
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+public static void main(String[] args) {
+
+    CreditCardPayment cardStrategy
+            = new CreditCardPayment();
+
+    PaymentProcessor processor
+            = new PaymentProcessor(
+                cardStrategy);
+
+    processor.processPayment();
+
+    PayconiqPayment payconiqStrategy
+            = new PayconiqPayment();
+
+    processor.setStrategy(payconiqStrategy);
+
+    processor.processPayment();
+}
+```
+</div>
+</div>
+
+
+---
+
+# Liskov Substitution Principle 
+
+Une instance de type T doit pouvoir être remplacée par une instance de type G, tel que G sous-type de T, sans que cela ne modifie la cohérence du programme. 
+Cela garantit que les sous-classes peuvent être utilisées de manière interchangeable avec leurs classes de base.
+
+L'extension d'une classe **ne doit pas modifier le comportement attendu des méthodes remplacées**.
+
+---
+
+# Liskov Substitution Principle  - Exemple
+
+<div class="columns">
+<div>         
+
+```java
+class Rectangle {
+    protected int width, height;
+
+    public Rectangle(int width, 
+                int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    public void setWidth(int width) { 
+        this.width = width; 
+    }
+    public void setHeight(int height) { 
+        this.height = height; 
+    }
+    public int getArea() { 
+        return width * height; 
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+class Square extends Rectangle {
+    public Square(int side) {
+        this.width = side;
+        this.height = side;
+    }
+
+    @Override
+    public void setWidth(int width) {
+        this.width = width;
+        this.height = width;
+    }
+
+    @Override
+    public void setHeight(int height) {
+        this.width = height;
+        this.height = height;
+    }
+}
+```
+
+</div>
+</div>
+
+---
+# Liskov Substitution Principle  - Exemple
+
+```java
+public static void main(String[] args) {
+    Rectangle rect = new Rectangle();
+    rect.setWidth(4);
+    rect.setHeight(5);
+    System.out.println("Rectangle area: " + rect.getArea());  // 4 * 5 = 20
+
+    Rectangle square = new Square();
+    square.setWidth(4);
+    square.setHeight(5);
+
+    System.out.println("Square area: " + square.getArea());  // 5 * 5 = 25 au lieu de 4 * 5
+}
+```
+---
+
+# Liskov Substitution Principle  - Exemple
+
+<div class="columns">
+<div>         
+
+```java
+interface Shape {
+    int getArea();
+}
+
+class Rectangle implements Shape {
+    protected int width, height;
+
+    public Rectangle(int width, 
+               int height) {
+
+        this.width = width;
+        this.height = height;
+
+    }
+...
+}
+```
+
+</div> 
+<div>
+
+```java
+
+class Square implements Shape {
+    private int side;
+
+    public Square(int side) { 
+        this.side = side; 
+    }
+    
+    ...
+```
+
+</div>
+</div>
+
+---
+
+# Liskov Substitution en lien avec le pattern factory
+
+<div class="columns">
+<div>         
+
+```java
+class ShapeFactory {
+
+    public static Shape createRectangle(
+              int width, int height) {
+        return new Rectangle(width, height);
+    }
+
+    public static Shape createSquare(
+               int side) {
+        return new Square(side);
+    }
+
+}
+```
+
+</div> 
+<div>
+
+La fabrique (**factory**) est un patron de conception créationnel utilisé en programmation orientée objet. 
+
+Elle permet d'instancier des objets dont le type est dérivé d'un type abstrait. 
+
+La **classe exacte** de l'objet n'est donc **pas connue par l'appelant**. 
+
+</div>
+</div>
+
+
+---
+# Interface Segregation Principle
+
+Préférer **plusieurs interfaces spécifiques** pour chaque client plutôt qu'une seule interface générale. 
+
+Cela évite aux classes de dépendre de méthodes dont elles n'ont pas besoin, réduisant ainsi les couplages inutiles.
+
+---
+
+# Interface Segregation Principle  - Exemple
+
+```java
+interface Worker {
+    void work();
+    void eat();
+}
+
+class Developer implements Worker {
+
+    public void work() {
+        System.out.println("Writing code...");
+    }
+
+    public void eat() {
+        throw new UnsupportedOperationException("Developers don’t eat at work!");
+    }
+}
+```
+
+
+La classe `Developer` ne devrait pas être obligée d’implémenter `eat()`.
+
+
+---
+
+# Interface Segregation Principle  - Exemple
+
+<div class="columns">
+<div>         
+
+```java
+interface Workable {
+    void work();
+}
+
+interface Eatable {
+    void eat();
+}
+
+class Developer 
+         implements Workable {
+    public void work() {
+        System.out.println(
+            "Writing code...");
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+class HumanWorker 
+        implements Workable,
+                      Eatable {
+
+    public void work() {
+        System.out.println(
+            "Working...");
+    }
+
+    public void eat() {
+        System.out.println(
+            "Eating...");
+    }
+}
+```
+
+</div>
+</div>
+
+---
+
+# Dependency Inversion Principle
+
+Il faut **dépendre** des **abstractions**, pas des implémentations. 
+
+Cela favorise la modularité, la flexibilité et la réutilisabilité en réduisant les dépendances directes entre les modules.
+
+---
+
+# Dependency Inversion Principle  - Exemple
+
+<div class="columns">
+<div>         
+
+```java
+class Keyboard {
+    public String getInput() {
+        return "User input";
+    }
+}
+
+class Computer {
+    private Keyboard keyboard = new Keyboard();
+
+    public void useKeyboard() {
+        System.out.println("Using: " 
+            + keyboard.getInput());
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+interface InputDevice {
+    String getInput();
+}
+
+class Keyboard implements InputDevice {
+    public String getInput() {
+        return "User input from Keyboard";
+    }
+}
+
+class Computer {
+    private InputDevice inputDevice;
+
+    public Computer(InputDevice inputDevice) {
+        this.inputDevice = inputDevice;
+    }
+
+    public void useInputDevice() {
+        System.out.println("Using: " 
+            + inputDevice.getInput());
+    }
+}
+```
+
+</div>
+</div>
+
+---
+
+# Pourquoi appliquer SOLID ?
+
+- **Facilite la maintenance et l’évolutivité**
+- **Réduit le couplage et améliore la réutilisabilité**
+- **Facilite les tests unitaires**
+- **Favorise un code plus clair et modulaire**
+- **Conserver la conformité aux spécifications inchangées**
+
+---
+
+# Principle of Least Knowledge - Loi de Demeter
+
+La Loi de Déméter stipule qu'un module ou une classe ne doit interagir qu'avec **ses dépendances directes** et **éviter les chaînes d’appels** profondes.
+
+Une méthode d'un objet ne doit appeler que :
+
+- Ses propres méthodes
+- Les méthodes de ses attributs directs
+- Les méthodes des paramètres qu’elle reçoit
+- Les méthodes de ses propres objets créés
+
+---
+# Loi de Demeter - Exemple
+
+```java
+class Address {
+    private String city;
+
+    public Address(String city) {
+        this.city = city;
+    }
+
+    public String getCity() {
+        return city;
+    }
+}
+```
+
+---
+# Loi de Demeter - Exemple
+
+`Order` dépend de `Person` **et** de `Address`, le **couplage** est fort.
+
+<div class="columns">
+<div>         
+
+```java
+class Person {
+    private Address address;
+
+    public Person(Address address) {
+        this.address = address;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+class Order {
+    private Person customer;
+
+    public Order(Person customer) {
+        this.customer = customer;
+    }
+
+    public void printCustomerCity() {
+        System.out.println(
+             customer
+                  .getAddress()
+                         .getCity()); 
+    }
+}
+```
+
+</div>
+</div>
+
+---
+
+# Loi de Demeter - Exemple
+
+`Order` ne dépend que de `Person`, ce qui réduit le **couplage**.
+
+<div class="columns">
+<div>         
+
+```java
+class Person {
+    private Address address;
+
+    public Person(Address address) {
+        this.address = address;
+    }
+
+    public String getCity() { 
+        return address.getCity();
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+class Order {
+    private Person customer;
+
+    public Order(Person customer) {
+        this.customer = customer;
+    }
+
+    public void printCustomerCity() {
+        System.out.println(
+            customer.getCity());
+    }
+}
+```
+
+</div>
+</div>
+
+---
+
+# Limites des principes SOLID
+
+## Complexité accrue
+- **Problème :** Appliquer strictement SOLID peut fragmenter le code en trop de petites classes et interfaces, rendant le projet difficile à suivre.  
+- **Solution :** Appliquer SOLID avec bon sens, en évitant une abstraction excessive si elle n’apporte pas de valeur.  
+
+**Exemple :**  
+- Avoir une **interface par type de paiement** (`CreditCardPayment`, `PaypalPayment`, etc.) est utile.  
+- Mais créer une **interface pour chaque méthode** (`ProcessPayment`, `VerifyPayment`, `RefundPayment`) peut être exagéré.
+
+---
+
+# Limites des principes SOLID
+
+## Risque de surconception (Overengineering)
+- **Problème :** Trop appliquer **OCP (Ouvert/Fermé)** et **DIP (Dépendance Inversion)** peut mener à des couches d’abstraction inutiles.  
+- **Solution :** Appliquer **KISS** (*Keep It Simple, Stupid*) et introduire des abstractions seulement si nécessaire.
+
+**Exemple :**  
+- Si une **classe concrète suffit** (`FileLogger`), inutile de créer une **interface** (`ILogger`) et plusieurs implémentations si le besoin ne se présente pas encore.
+
+---
+
+# Limites des principes SOLID
+
+## Difficulté d’application dans les petits projets
+- **Problème :** Dans un **projet simple**, appliquer SOLID peut être inutilement contraignant et ralentir le développement.  
+- **Solution :** SOLID est plus adapté aux **projets évolutifs**. Dans un petit projet, mieux vaut **prioriser la lisibilité et la simplicité**.
+
+**Exemple :**  
+- Une simple **classe utilitaire** (`MathUtils`) n’a pas besoin d’être fragmentée en plusieurs **interfaces et classes**.
+
+---
+# Limites des principes SOLID
+
+## Conclusion : SOLID ≠ dogme absolu
+SOLID **améliore la maintenabilité et la modularité** d’un projet.  
+Mais **trop l’appliquer peut compliquer inutilement le code**.  
+
+### Meilleure approche :
+- **Trouver un équilibre** entre SOLID, lisibilité et simplicité.  
+- Toujours se demander : **"Est-ce que cette abstraction ajoute vraiment de la valeur ?"**  
+
+**SOLID est un outil, pas une règle absolue !**
+
+
+
+---
+
+<!-- _class: transition2 -->  
+
+JDBC<br>
+Design Pattern Repository
+
+--- 
+
+<!-- _class: cite -->  
+
+**Java Data Base Connectivity** est une API qui permet d’exploiter des bases de données au travers de requêtes SQL. 
+Cette API permet d’écrire un code **indépendant du SGBD** utilisé.
+
+---
+
+# Classes essentielles de l'API
+
+- **DriverManager** : Gère les pilotes JDBC et établit des connexions à une base de données.
+- **Connection** : Représente une connexion active à une base de données, permettant d'exécuter des requêtes SQL.
+- **Statement** : Utilisé pour exécuter des requêtes SQL statiques (SELECT, INSERT, UPDATE, DELETE).
+- **ResultSet**: Contient les résultats d'une requête SQL SELECT et permet d'itérer sur les données retournées.
+- **SqlException** : Exception levée en cas d'erreur liée à l'exécution d'une requête SQL.
+
+---
+# Commencer par ajouter le Driver
+
+
+
+<div class="columns">
+<div>         
+
+### Driver pour SQLite
+
+```xml
+<dependency>
+    <groupId>org.xerial</groupId>
+    <artifactId>sqlite−jdbc</artifactId>
+    <version>3.49.0.0</version>
+</dependency>
+```
+
+</div> 
+<div>
+
+### Driver pour MySQL
+
+
+```xml
+<dependency>
+    <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+    <version>9.2.0</version>
+</dependency>
+```
+
+</div>
+</div>
+
+---
+
+# Écrire une requête de selection
+
+```java
+try {
+    Connection connexion = DriverManager.getConnection("jdbc:sqlite:data/sqlite/demo.db";
+    Statement stmt = connexion.createStatement();
+
+    String query = "SELECT id,firstname,lastname FROM STUDENTS";
+
+    ResultSet result = stmt.executeQuery(query);
+
+    while (result.next()) {
+        int id = result.getInt("id");
+        String firstname = result.getString("firstname");
+        String lastname = result.getString("lastname");
+        System.out.println("\t record : " + id + " " + firstname + " " + lastname);
+    }
+} catch (SQLException ex) {
+    System.out.println("DEMO_SELECT_ALL | Erreur " + ex.getMessage() + " SQLState " + ex.getSQLState());
+}
+```
+
+---
+# Écrire une requête de mise à jour
+
+```java
+try {
+    Connection connexion = DriverManager.getConnection("jdbc:sqlite:data/sqlite/demo.db";
+    Statement stmt = connexion.createStatement();
+
+    String query = "UPDATE STUDENTS SET firstname='Patrick',lastName='Star' where id=1 ";
+
+    int count = stmt.executeUpdate(query);
+    System.out.println("\t Nombre de record modifié : " + count);
+    
+} catch (SQLException ex) {
+    System.out.println("DEMO_UPDATE | Erreur " + ex.getMessage() + " SQLState " + ex.getSQLState());
+}
+```
+
+---
+
+# Code vulnérable ?
+
+```java
+public void execute(String query) {
+    try {
+        Connection connexion = DriverManager.getConnection("jdbc:sqlite:data/sqlite/demo.db";
+        Statement stmt = connexion.createStatement();
+
+        int count = stmt.executeUpdate(query);
+        System.out.println("\t Nombre de record modifié : " + count);
+
+    } catch (SQLException ex) {
+        System.out.println("DEMO_UPDATE | Erreur " + ex.getMessage() + " SQLState " + ex.getSQLState());
+    }
+}
+```
+
+---
+# Injection SQL
+
+- La méthode `execute` accepte une requête SQL en paramètre (`query`) qui est ensuite exécutée directement avec `Statement`.
+- `Statement` ne protège pas contre les entrées malveillantes.
+- Un attaquant peut injecter du SQL arbitraire en passant une requête malveillante.
+
+```java
+execute("DELETE FROM users WHERE 1=1; --");
+```
+
+ Suppression de toutes les lignes de la table users !
+
+---
+# PrepareStatement
+
+```java
+public void executeSafe(String query, String name, int id) {
+    try (Connection connexion = DriverManager.getConnection("jdbc:sqlite:data/sqlite/demo.db")) {
+        String sql = "UPDATE users SET name = ? WHERE id = ?";
+        try (PreparedStatement pstmt = connexion.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.setInt(2, id);
+            int count = pstmt.executeUpdate();
+            System.out.println("\t Nombre de records modifiés : " + count);
+        }
+    } catch (SQLException ex) {
+        System.out.println("DEMO_UPDATE | Erreur " + ex.getMessage() + " SQLState " + ex.getSQLState());
+    }
+}
+```
+
+---
+# PreparedStatement
+
+- Évite l'**injection** SQL : Les valeurs sont séparées de la requête SQL.
+- Meilleure performance : La requête est **précompilée** par la base de données.
+- Les mutateurs permettent de lier des valeurs dynamiques aux requêtes SQL : 
+    - `setString(1, "Alice")`
+    - `setInt(2, 30)`
+    - `setDouble(3, 1500.75)`
+    - `setNull(13, Types.INTEGER)`
+    - `setBoolean(5, true)`
+
+---
+
+<!-- _class: cite -->  
+
+Le design pattern **Repository** est un modèle d’architecture utilisé pour **séparer** la **logique d'accès aux données** de la **logique métier** d’une application. 
+
+---
+
+# L'interface Repository
+
+<div class="columns">
+<div>         
+
+```java
+public interface Repository<T, K> {
+    void save(T entity);
+    void deleteById(K id);
+    T findById(K id);
+    List<T> findAll();
+}
+```
+
+</div> 
+<div>
+
+Décomposition des génériques <T, K>
+
+- T : le type d'entité (ex: User, Product, etc.).
+- K : le type de l'identifiant (ex: Integer, Long, etc.).
+
+</div>
+</div>
+
+---
+
+# Implémentation intuitive avec JDBC
+
+```java
+public class UserSqliteRepository implements Repository<User, Integer> {
+    private static final String URL = "jdbc:sqlite:users.db";
+    private Connection connection;
+
+    public UserSqliteRepository() {
+        this.connection = DriverManager.getConnection(URL);
+    }
+
+    @Override
+    public void save(User user)  {
+        String sql = "INSERT INTO users (name, email) VALUES (?, ?)";
+        PreparedStatement pstmt = connection.prepareStatement(sql));
+        pstmt.setString(1, user.getName());
+        pstmt.setString(2, user.getEmail());
+        pstmt.executeUpdate();
+    }
+```
+
+---
+
+# Implémentations multiples possibles
+
+```java
+public class UserSqlLiteRepository implements Repository<User, Integer> {
+...
+}
+
+public class UserMySqlRepository implements Repository<User, Integer> {
+...
+}
+
+public class UserFileRepository implements Repository<User, Integer> {
+...
+}
+
+public class UserFirebaseRepository implements Repository<User, Integer> {
+...
+}
+
+```
+
+---
+
+# Data Access Object et Data Transfert Object
+
+Le pattern Repository peut être complété par deux autres concepts clés :
+
+- DAO (Data Access Object) : Gère l'accès aux données dans la base de données.
+- DTO (Data Transfer Object) : Transporte des données entre couches de l’application.
 
 
 ---

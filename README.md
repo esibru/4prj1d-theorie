@@ -2,6 +2,10 @@
 
 Ce projet contient les supports des leçons de théorie de l'unité 4PRJ1D.
 
+## URL de publication
+
+Le résultat de ce projet est disponible en ligne sur : https://esibru.github.io/4prj1d-theorie/
+
 ## Inspiration
 
 Les styles des présentations sont repris du dépôt :  https://github.com/cunhapaulo/marpstyle
