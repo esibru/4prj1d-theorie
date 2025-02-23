@@ -2259,13 +2259,688 @@ Des tests unitaires aux tests utilisateurs
 
 --- 
 
-<div>         
- 
-![h:450px](./img/work-in-progress.jpeg)
-   
-</div> 
+<!-- _class: cite -->  
+
+Un test en développement logiciel est un processus permettant de **vérifier** qu'un programme fonctionne comme attendu en contrôlant ses différentes **fonctionnalités**.
+
+--- 
+
+# Intérêt des tests
+
+- **Assurer la qualité du code** : Vérifier que le code respecte les exigences du projet.
+- **Faciliter la maintenance** : Garantir que le code ne cassent pas les parties existantes.
+- **Réduire le coût des corrections** : En identifiant les bugs dès la phase de développement.
+- **Faciliter le travail en équipe** : Assurer qu'une modification d'un développeur ne perturbe pas le travail des autres.
+- **Améliorer l'expérience utilisateur** : En incluant les utilisateurs dans le processus de test.
 
 ---
+
+# Philosophie du test
+
+- **Le test est un processus "destructif"** : Son objectif est de mettre en évidence les erreurs et faiblesses du logiciel et non de prouver qu'il est exempt de défauts.
+- **Tester, c’est exécuter le programme pour y trouver des défauts** : Un bon test vise à identifier des bugs et non à confirmer que tout fonctionne parfaitement.
+- **Un test ne prouve pas l'absence d’erreur** : Même si un test passe avec succès, cela ne garantit pas que le logiciel est sans défauts. Il ne fait que montrer que certaines erreurs n'ont pas été détectées dans un contexte donné.
+- **Un test efficace est un test qui échoue** : Trouver un bug signifie que le test a réussi à mettre en évidence une faiblesse du programme permettant ainsi de l'améliorer.
+
+---
+# Types de tests
+
+- **Tests unitaires** : Vérifient le bon fonctionnement d'une unité de code (méthode ou classe).
+- **Tests d'intégration** : S'assurent que plusieurs composants fonctionnent ensemble.
+- **Tests fonctionnels** : Valident que le logiciel répond aux exigences métier.
+- **Tests de validation** : Vérifient que le logiciel respecte les spécifications définies.
+- **Tests de recette** : Effectués par le client pour valider que le logiciel répond à ses besoins.
+- **Tests d'acceptance** : Confirment que le système est prêt pour une utilisation opérationnelle.
+- **Tests end-to-end** : Simulent un parcours utilisateur complet.
+- **Tests de performance** : Évaluent la rapidité et la stabilité sous différentes charges.
+- **Tests de régression** : Vérifient que les modifications ne génèrent pas de nouveaux bugs.
+
+---
+# Gérer un projet via le cycle en V
+
+<div class="columns">
+<div>  
+
+- **Définition** : Le cycle en V est un modèle de gestion de projet en développement logiciel qui organise les phases du projet en deux branches : 
+  - Une phase descendante de **spécification et conception**.
+  - Une phase montante de **validation et tests**.
+
+</div> 
+<div>
+
+![h:400](./img/Cycle_V.jpg)
+
+</div>
+</div>
+
+---
+# Cycle en V
+
+- **Principes clés** :
+  - Chaque phase de spécification a une phase de test associée.
+  - Le passage d'une étape à l'autre est strictement séquentiel.
+  - La validation commence dès les premières phases en préparant les tests en parallèle de la conception.
+
+- **Avantages** :
+  - Modèle structuré permettant une traçabilité claire entre exigences et tests.
+  - Adapté aux projets avec des exigences bien définies.
+
+- **Inconvénients** :
+  - Manque de flexibilité face aux changements.
+  - Tests réalisés tardivement, ce qui peut entraîner des corrections coûteuses.
+
+---
+
+<!-- _class: cite --> 
+
+Les tests représentent généralement **25% à 35%** du temps total du projet. Dans certains projets critiques (comme en aéronautique, santé, ou finance), ce pourcentage peut être encore plus élevé. En méthodologie agile, les tests sont intégrés en continu, ce qui peut modifier cette répartition.
+
+---
+# Tests unitaires avec JUnit5
+
+<div class="columns">
+<div>  
+
+### Structure d'un projet maven
+
+```
+my-javafx-app/
+│-- src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── be/esi/prj/
+│   │   │       ├── Demo.java
+│   ├── test/
+│   │   ├── java/
+│   │   │   └── be/esi/prj/
+│   │   │       ├── DemoTest.java
+│-- pom.xml
+```
+
+</div> 
+<div>
+
+### pom.xml et dépendances
+```java
+<dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter</artifactId>
+    <version>5.12.0</version>
+    <scope>test</scope>
+</dependency>
+```
+
+### Annotation de test
+```java
+    @Test
+    void testMethod() {}
+```
+
+</div>
+</div>
+
+---
+# Tests unitaires et AAA
+
+<div class="columns">
+<div> 
+
+Le Test Pattern AAA est une approche standardisée pour écrire des tests unitaires de manière claire et lisible. Il se compose de trois étapes distinctes :
+
+1. **Arrange** : Initialisation des objets et des données nécessaires pour le test.
+2. **Act** : Exécution de la méthode ou du comportement à tester.  
+3. **Assert** : Validation du résultat en comparant la sortie obtenue avec la sortie attendue.  
+
+</div> 
+<div>
+
+```java
+@Test
+void testAddition() {
+    // Arrange (Préparation)
+    Calculator calculator 
+                = new Calculator();
+
+    // Act (Action)
+    int result = calculator.add(2, 3);
+
+    // Assert (Vérification)
+    assertEquals(5, result, 
+                "2 + 3 should equal 5");
+}
+```
+
+</div>
+</div>
+
+---
+# Annotations JUnit 5 les plus utiles
+
+- **`@Test`** : Indique qu'une méthode est un test unitaire.
+- **`@BeforeEach`** : Exécute une méthode avant chaque test, utile pour initialiser des objets.
+- **`@AfterEach`** : Exécute une méthode après chaque test, utile pour nettoyer des ressources.
+- **`@BeforeAll`** : Exécute une méthode statique une seule fois avant tous les tests de la classe.
+- **`@AfterAll`** : Exécute une méthode statique une seule fois après tous les tests de la classe.
+- **`@ParameterizedTest`** : Permet d'exécuter un test avec plusieurs valeurs d'entrée.
+- **`@ValueSource`** : Fournit des valeurs primitives pour un test paramétré.
+- **`@RepeatedTest(N)`** : Répète un test un certain nombre de fois.
+- **`@ExtendWith(Extension.class)`** : Utilisé pour ajouter des extensions comme Mockito.
+
+---
+# Junit5 : exemple d'annotations
+
+<div class="columns">
+<div> 
+
+```java
+@BeforeEach
+void setup() {
+    calculator = new Calculator();
+}
+
+@Test
+void testAddition() {
+    int result = calculator.add(2, 3);
+    assertEquals(5, result, 
+                "2 + 3 should equal 5");
+}
+
+@Test
+void testSubtraction() {
+    int result = calculator.subtract(3, 2);
+    assertEquals(1, result, 
+                    "3 - 2 should equal 1");
+}
+```
+</div> 
+<div>
+
+```
+@ParameterizedTest
+@ValueSource(ints = {1, 2, 3, 4, 5})
+void testProductByZero(int number) {
+
+    int result 
+        = calculator.multiply(number, 0);
+
+    assertEquals(0, result, 
+        number + " * 0 should equal 0");
+
+}
+```
+
+</div>
+</div>
+
+
+---
+# Tests unitaires et bonnes pratiques
+
+<div class="columns">
+<div> 
+
+```java
+public double calculateTotal(Order order) {
+    double total = 0.0;
+    for (Item item : order.getItems()) {
+        total += item.getPrice() * item.getQuantity();
+    }
+
+    if (order.getDiscountCode() != null) {
+        if (order.getDiscountCode().equals("SALE10")) {
+            total *= 0.9; // Remise de 10%
+        }
+        else if (order.getDiscountCode().equals("SALE20")) {
+            total *= 0.8; // Remise de 20%
+        }
+    }
+
+    if (total < 50) {
+        total += 10.0; // Frais de livraison si moins de 50€
+    }
+
+    total += total * 0.15; // Application de la taxe de 15%
+
+    return total;
+}
+```
+
+</div> 
+<div>
+
+- Méthode trop longue et trop de responsabilités :
+  - Cela rend la méthode difficile à tester, car tester ces fonctionnalités séparément dans des tests unitaires devient compliqué.
+- Tests unitaires difficiles à isoler :
+  - Pour tester ce code, il faudrait simuler différentes situations (remises, frais de livraison, taxes), mais en raison de la complexité de la méthode, cela devient difficile. Modifier un paramètre dans le test peut affecter plusieurs parties de la méthode.
+- Manque de clarté :
+  - Le code est très dense. Une fois qu'on ajoute des tests unitaires, la maintenance devient un cauchemar. S'il y a un bug dans la logique de remise ou de frais de livraison, il pourrait être difficile de localiser l'erreur à cause de l'absence de découpage clair.
+
+</div>
+</div>
+
+---
+# Sans le design pattern builder
+
+<div class="columns">
+<div> 
+
+```java
+public class User {
+    private String firstName;
+    private String lastName;
+    private int age;
+    private String email;
+    private String address;
+
+    public User(String firstName, 
+                String lastName, 
+                int age, String email, 
+                String address) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.email = email;
+        this.address = address;
+    }
+    // Getters ...
+```
+
+</div> 
+<div>
+
+```java
+@Test
+void testUserCreationWithoutBuilder() {
+    User user = new User( "John", 
+                    "Doe",  30, 
+                    "john.doe@example.com", 
+                    "123 Main St");
+
+    assertEquals("John", 
+                    user.getFirstName());
+    assertEquals("Doe", 
+                    user.getLastName());
+    assertEquals(30, 
+                    user.getAge());
+    assertEquals("john.doe@example.com", 
+                    user.getEmail());
+    assertEquals("123 Main St", 
+                    user.getAddress());
+}
+```
+
+</div>
+</div>
+
+---
+# Le design pattern builder
+
+<div class="columns">
+<div> 
+
+```java
+public class UserBuilder {
+    private String firstName;
+    private String lastName;
+    private int age;
+    private String email;
+    private String address;
+
+    public UserBuilder firstName(
+                            String firstName) {
+        this.firstName = firstName;
+        return this;
+    }
+
+    public UserBuilder lastName(
+                            String lastName) {
+        this.lastName = lastName;
+        return this;
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+    public UserBuilder age(int age) {
+        this.age = age;
+        return this;
+    }
+
+    public UserBuilder email(String email) {
+        this.email = email;
+        return this;
+    }
+
+    public UserBuilder address(String address) {
+        this.address = address;
+        return this;
+    }
+
+    public User build() {
+        return new User(firstName, 
+                        lastName, age, 
+                        email, address);
+    }
+```
+
+</div>
+</div>
+
+---
+# Le design pattern builder
+
+<div class="columns">
+<div> 
+
+```java
+@Test
+void testUserCreationWithBuilder() {
+    User user = new UserBuilder()
+            .firstName("John")
+            .lastName("Doe")
+            .age(30)
+            .email("john.doe@example.com")
+            .address("123 Main St")
+            .build();
+
+    assertEquals("John", user.getFirstName());
+    assertEquals("Doe", user.getLastName());
+    assertEquals(30, user.getAge());
+    assertEquals("john.doe@example.com", 
+                                user.getEmail());
+    assertEquals("123 Main St", 
+                                user.getAddress());
+}
+```
+
+</div> 
+<div>
+
+- **Lisibilité améliorée** : La construction plus claire grâce aux appels enchaînés.
+- **Évite les constructeurs avec trop de paramètres** : Plus besoin de se rappeler de l'ordre des paramètres d'un constructeur.
+- **Facilité d'ajout de nouveaux attributs** : Il suffit d'ajouter une nouvelle méthode dans UserBuilder, sans casser le code existant.
+- **Meilleure réutilisation et maintenabilité des tests** : On peut créer une méthode createDefaultUser() qui retourne un utilisateur préconfiguré avec le Builder.
+</div>
+</div>
+
+---
+# Tests unitaires et Mock
+
+```xml
+<dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-core</artifactId>
+    <version>5.15.2</version>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-junit-jupiter</artifactId>
+    <version>5.15.2</version>
+    <scope>test</scope>
+</dependency>
+```
+
+---
+# Utilité d'un Mock
+
+```java
+public class PaymentService {
+    private final PaymentGateway paymentGateway;
+
+    public PaymentService(PaymentGateway paymentGateway) {
+        this.paymentGateway = paymentGateway;
+    }
+
+    public String processOrderPayment(Order order) {
+        boolean paymentSuccess = paymentGateway.processPayment(order);
+        return paymentSuccess ? "Payment Successful" : "Payment Failed";
+    }
+}
+```
+
+---
+# Mock et JUnit5
+
+```java
+@ExtendWith(MockitoExtension.class)
+class PaymentServiceTest {
+
+    @Mock
+    private PaymentGateway mockPaymentGateway; // Création du mock du PaymentGateway
+
+    @InjectMocks
+    private PaymentService paymentService;
+
+    @Test
+    void testProcessOrderPayment_successfulPayment() {
+        // Arrange : Préparer le mock pour qu'il retourne true, signifiant que le paiement est réussi
+        Order order = new Order(100.0, "Laptop");
+        when(mockPaymentGateway.processPayment(order)).thenReturn(true);
+
+        // Act : Appeler la méthode à tester
+        String result = paymentService.processOrderPayment(order);
+
+        // Assert : Vérifier que le message de succès est retourné
+        assertEquals("Payment Successful", result, "Le paiement devrait être réussi");
+
+        Mockito.verify(mockPaymentGateway, times(1)).processPayment(order);
+    }
+```
+
+---
+# Couverture de tests
+
+La couverture de tests mesure le pourcentage de code exécuté lors des tests. 
+Des outils comme JaCoCo permettent d'analyser cette couverture.
+
+Bien que des tests avec une bonne couverture de code puissent 
+aider à détecter des erreurs, la couverture à 100% ne 
+garantit pas un code sans erreur. 
+Il est également important de tester des cas d'usage réels, 
+des scénarios extrêmes et des comportements non trivials 
+pour garantir la robustesse du code.
+
+---
+# Boîte noire - Boîte blanche
+
+```java
+public class PasswordValidator {
+
+    public boolean isValid(String password) {
+        if (password == null || password.length() < 8) {
+            return false;
+        }
+        boolean hasUpperCase = false, hasLowerCase = false, hasDigit = false;
+
+        for (char c : password.toCharArray()) {
+            if (Character.isUpperCase(c)) hasUpperCase = true;
+            if (Character.isLowerCase(c)) hasLowerCase = true;
+            if (Character.isDigit(c)) hasDigit = true;
+        }
+
+        return hasUpperCase && hasLowerCase && hasDigit;
+    }
+}
+```
+
+---
+# Boîte noire
+
+<div class="columns">
+<div> 
+
+```java
+@Test
+void testValidPasswords() {
+    assertTrue(validator.isValid("SecureP@ss123"));
+    assertTrue(validator.isValid("Hello123"));
+}
+
+@Test
+void testInvalidPasswords() {
+    assertFalse(validator.isValid(null));
+    assertFalse(validator.isValid("short"));
+    assertFalse(validator.isValid("alllowercase"));
+    assertFalse(validator.isValid("ALLUPPERCASE"));
+    assertFalse(validator.isValid("12345678"));
+}
+```
+
+</div> 
+<div>
+
+Les tests boîte noire se basent uniquement sur les entrées et sorties du programme. On ne regarde pas le code interne.
+
+</div>
+</div>
+
+---
+# Boîte blanche
+
+Examiner le code source pour s'assurer que toutes les branches sont couvertes.
+
+<div class="columns">
+<div> 
+
+```java
+@Test
+void testNullPassword() {
+    assertFalse(validator.isValid(null));
+}
+
+@Test
+void testShortPassword() {
+    assertFalse(validator.isValid("Short1"));
+}
+
+@Test
+void testOnlyLowercase() {
+    assertFalse(validator.isValid("onlylowercase1"));
+}
+```
+
+</div> 
+<div>
+
+```java
+@Test
+void testOnlyUppercase() {
+    assertFalse(validator.isValid("ONLYUPPERCASE1"));
+}
+
+@Test
+void testOnlyDigits() {
+    assertFalse(validator.isValid("12345678"));
+}
+
+@Test
+void testValidPassword() {
+    assertTrue(validator.isValid("Valid123"));
+}
+```
+
+</div>
+</div>
+
+---
+# Boite noire versus boite blanche
+
+- Les tests boites noires garantissent que le programme respecte ses spécifications.
+- Les tests boite blanches s'assurent que chaque instruction a été exécutée au moins une fois.
+- Les deux types de tests sont complémentaires et doivent être utilisés ensemble pour garantir un logiciel robuste. 
+
+
+---
+# Tests d'intégration
+
+---
+# Tests fonctionnels
+
+Un test fonctionnel est un test qui vérifie que le logiciel répond aux exigences métier et aux spécifications fonctionnelles.
+
+Tests fonctionnels = vérification des fonctionnalités définies par les cas d'utilisation.
+
+### Objectifs des tests fonctionnels :
+
+- S'assurer que chaque fonctionnalité fonctionne comme attendu.
+- Tester le comportement externe du logiciel, sans se soucier de son implémentation interne.
+- Vérifier les entrées et sorties pour divers cas d'utilisation.
+
+---
+# Tests fonctionnels déduit d'un diagramme d'activités
+
+- Pour chaque cas d'utilisation on réalise un diagramme d'activité.
+- Un diagramme d'activités aide à identifier tous les chemins possibles et donc tous les cas de test.
+- Chaque transition devient un scénario de test dans un plan structuré.
+- Cette méthode garantit une couverture complète des fonctionnalités testées.
+- Idéal pour dériver un plan de test fonctionnel systématique et éviter les oublis ! 
+
+---
+# Nombre de chemins dans un diagramme d'activités
+ 
+![h:450](./img/diagramme_activites-h.png)
+
+---
+# Plan de tests fonctionnels 1/4
+
+| **ID Test** | **Scénario** | **Étapes** | **Données d’entrée** | **Résultat attendu** |
+|-------------|--------------|------------|----------------------|----------------------|
+| TF-001 | Connexion réussie | 1. Aller sur la page de connexion <br> 2. Entrer des identifiants valides <br> 3. Cliquer sur "Se connecter" | Identifiant : `user123` <br> Mot de passe : `password123` | Redirection vers le tableau de bord |
+
+---
+# Plan de tests fonctionnels 2/4
+
+| **ID Test** | **Scénario** | **Étapes** | **Données d’entrée** | **Résultat attendu** |
+|-------------|--------------|------------|----------------------|----------------------|
+| TF-002 | Tentatives infructueuses (mot de passe incorrect) | 1. Aller sur la page de connexion <br> 2. Entrer un identifiant valide et un mot de passe incorrect <br> 3. Cliquer sur "Se connecter" | Identifiant : `user123` <br> Mot de passe : `wrongpass` | Message d’erreur "Mot de passe incorrect" |
+
+
+---
+# Plan de tests fonctionnels 3/4
+
+| **ID Test** | **Scénario** | **Étapes** | **Données d’entrée** | **Résultat attendu** |
+|-------------|--------------|------------|----------------------|----------------------|
+| TF-003 | Tentatives répétées avec mot de passe incorrect (bloquage du compte) | 1. Essayer 3 fois avec un mot de passe incorrect <br> 2. Vérifier si le compte est verrouillé | Identifiant : `user123` <br> Mot de passe : `wrongpass` (x3) | Message "Compte bloqué" |
+
+---
+# Plan de tests fonctionnels 4/4
+
+| **ID Test** | **Scénario** | **Étapes** | **Données d’entrée** | **Résultat attendu** |
+|-------------|--------------|------------|----------------------|----------------------|
+| TF-004 | Tentatives limitées (moins de 3) | 1. Essayer 2 fois avec un mot de passe incorrect <br> 2. Vérifier si le compte n'est pas bloqué | Identifiant : `user123` <br> Mot de passe : `wrongpass` (x2) | Affichage du message d'erreur sans blocage du compte |
+
+---
+# Problème du grand nombre de cas de tests
+
+- **Complexité de gestion** : Le nombre de cas de tests augmente rapidement avec la taille et la complexité de l'application, ce qui peut rendre la gestion difficile.
+- **Redondance des tests** : Certains tests peuvent être redondants ou couvrir des cas similaires, ce qui peut être inutile et gaspiller du temps de test.
+- **Équilibre entre couverture et coût** : La couverture complète des tests peut sembler idéale, mais elle peut conduire à un point de rendement décroissant, où l'effort supplémentaire pour couvrir tous les cas de tests n'apporte plus de valeur ajoutée significative.
+
+---
+# Conseils : Prioriser les cas de tests
+
+- **Critères de risque** : Identifiez les zones à haut risque de votre application (par exemple, des fonctionnalités critiques ou récemment modifiées).
+- **Scénarios métier les plus importants** : Priorisez les tests qui valident les fonctionnalités métier clés de l’application.
+- **Historique des défauts** : Priorisez les tests dans les zones qui ont eu des défauts fréquents ou récents.
+
+---
+# Conseils : Tester les cas les plus probables
+
+- **Tests des cas courants** : Concentrez-vous sur les tests qui couvrent les scénarios les plus courants ou les plus utilisés par les utilisateurs finaux.
+- **Tests de régression** : Concentrez-vous sur les tests qui valident que les anciennes fonctionnalités ne sont pas cassées après des modifications récentes du code.
+
+---
+# Conseils : Techniques de réduction des tests 
+
+- **Test basé sur l’équivalence** : Regroupez les entrées similaires pour réduire le nombre de cas à tester tout en maintenant une couverture significative.
+- **Tests de frontières** : Testez les cas aux limites des entrées et sorties pour vérifier le bon fonctionnement du système dans les conditions extrêmes.
+
+---
+
 <!-- _class: transition2 -->  
 
 Architecture et gestion de projet<br>
