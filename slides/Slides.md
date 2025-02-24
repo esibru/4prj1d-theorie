@@ -2285,7 +2285,7 @@ Un test en développement logiciel est un processus permettant de **vérifier** 
 ---
 # Types de tests
 
-- **Tests unitaires** : Vérifient le bon fonctionnement d'une unité de code (méthode ou classe).
+- **Tests unitaires** : Vérifient le bon fonctionnement d'une unité de code, méthode ou classe.
 - **Tests d'intégration** : S'assurent que plusieurs composants fonctionnent ensemble.
 - **Tests fonctionnels** : Valident que le logiciel répond aux exigences métier.
 - **Tests de validation** : Vérifient que le logiciel respecte les spécifications définies.
@@ -2333,9 +2333,14 @@ Un test en développement logiciel est un processus permettant de **vérifier** 
 
 <!-- _class: cite --> 
 
-Les tests représentent généralement **25% à 35%** du temps total du projet. Dans certains projets critiques (comme en aéronautique, santé, ou finance), ce pourcentage peut être encore plus élevé. En méthodologie agile, les tests sont intégrés en continu, ce qui peut modifier cette répartition.
+Les tests représentent généralement **25% à 35%** du temps total du projet. Dans certains projets critiques (comme en aéronautique, santé, ou finance), ce pourcentage peut être encore plus élevé.
 
 ---
+<!-- _class: transition -->  
+
+Les Tests unitaires avec JUnit5
+
+--- 
 # Tests unitaires avec JUnit5
 
 <div class="columns">
@@ -2414,19 +2419,6 @@ void testAddition() {
 </div>
 
 ---
-# Annotations JUnit 5 les plus utiles
-
-- **`@Test`** : Indique qu'une méthode est un test unitaire.
-- **`@BeforeEach`** : Exécute une méthode avant chaque test, utile pour initialiser des objets.
-- **`@AfterEach`** : Exécute une méthode après chaque test, utile pour nettoyer des ressources.
-- **`@BeforeAll`** : Exécute une méthode statique une seule fois avant tous les tests de la classe.
-- **`@AfterAll`** : Exécute une méthode statique une seule fois après tous les tests de la classe.
-- **`@ParameterizedTest`** : Permet d'exécuter un test avec plusieurs valeurs d'entrée.
-- **`@ValueSource`** : Fournit des valeurs primitives pour un test paramétré.
-- **`@RepeatedTest(N)`** : Répète un test un certain nombre de fois.
-- **`@ExtendWith(Extension.class)`** : Utilisé pour ajouter des extensions comme Mockito.
-
----
 # Junit5 : exemple d'annotations
 
 <div class="columns">
@@ -2455,7 +2447,7 @@ void testSubtraction() {
 </div> 
 <div>
 
-```
+```java
 @ParameterizedTest
 @ValueSource(ints = {1, 2, 3, 4, 5})
 void testProductByZero(int number) {
@@ -2472,9 +2464,26 @@ void testProductByZero(int number) {
 </div>
 </div>
 
+---
+# Annotations JUnit 5 les plus utiles
+
+- **`@Test`** : Indique qu'une méthode est un test unitaire.
+- **`@BeforeEach`** : Exécute une méthode avant chaque test, utile pour initialiser des objets.
+- **`@AfterEach`** : Exécute une méthode après chaque test, utile pour nettoyer des ressources.
+- **`@BeforeAll`** : Exécute une méthode statique une seule fois avant tous les tests de la classe.
+- **`@AfterAll`** : Exécute une méthode statique une seule fois après tous les tests de la classe.
+- **`@ParameterizedTest`** : Permet d'exécuter un test avec plusieurs valeurs d'entrée.
+- **`@ValueSource`** : Fournit des valeurs primitives pour un test paramétré.
+- **`@RepeatedTest(N)`** : Répète un test un certain nombre de fois.
+- **`@ExtendWith(Extension.class)`** : Utilisé pour ajouter des extensions comme Mockito.
 
 ---
-# Tests unitaires et bonnes pratiques
+<!-- _class: transition -->  
+
+Quelques bonnes pratiques
+
+---
+# Tests unitaires et design pattern SOLID
 
 <div class="columns">
 <div> 
@@ -2508,18 +2517,19 @@ public double calculateTotal(Order order) {
 </div> 
 <div>
 
-- Méthode trop longue et trop de responsabilités :
-  - Cela rend la méthode difficile à tester, car tester ces fonctionnalités séparément dans des tests unitaires devient compliqué.
-- Tests unitaires difficiles à isoler :
-  - Pour tester ce code, il faudrait simuler différentes situations (remises, frais de livraison, taxes), mais en raison de la complexité de la méthode, cela devient difficile. Modifier un paramètre dans le test peut affecter plusieurs parties de la méthode.
-- Manque de clarté :
-  - Le code est très dense. Une fois qu'on ajoute des tests unitaires, la maintenance devient un cauchemar. S'il y a un bug dans la logique de remise ou de frais de livraison, il pourrait être difficile de localiser l'erreur à cause de l'absence de découpage clair.
-
+- Méthode ayant **trop de responsabilités**.
+- Tests unitaires difficiles à **isoler**.
+- La maintenance devient un cauchemar.
+- Solution, introduire les méthodes : 
+    - `double calculateItemsTotal(Order order)`
+    - `double applyDiscount(Order order, double total)`
+    - `double applyShippingCost(double total)`
+    - `double calculateItemsTotal(Order order)`
 </div>
 </div>
 
 ---
-# Sans le design pattern builder
+# Tests unitaires et design pattern builder
 
 <div class="columns">
 <div> 
@@ -2530,17 +2540,14 @@ public class User {
     private String lastName;
     private int age;
     private String email;
-    private String address;
 
     public User(String firstName, 
                 String lastName, 
-                int age, String email, 
-                String address) {
+                int age, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
         this.email = email;
-        this.address = address;
     }
     // Getters ...
 ```
@@ -2551,10 +2558,10 @@ public class User {
 ```java
 @Test
 void testUserCreationWithoutBuilder() {
-    User user = new User( "John", 
-                    "Doe",  30, 
-                    "john.doe@example.com", 
-                    "123 Main St");
+    User user 
+        = new User( "John", 
+                "Doe",  30, 
+                "john.doe@example.com");
 
     assertEquals("John", 
                     user.getFirstName());
@@ -2564,8 +2571,6 @@ void testUserCreationWithoutBuilder() {
                     user.getAge());
     assertEquals("john.doe@example.com", 
                     user.getEmail());
-    assertEquals("123 Main St", 
-                    user.getAddress());
 }
 ```
 
@@ -2573,7 +2578,7 @@ void testUserCreationWithoutBuilder() {
 </div>
 
 ---
-# Le design pattern builder
+# Implémenter une classe builder
 
 <div class="columns">
 <div> 
@@ -2584,46 +2589,41 @@ public class UserBuilder {
     private String lastName;
     private int age;
     private String email;
-    private String address;
 
     public UserBuilder firstName(
-                            String firstName) {
+            String firstName) {
         this.firstName = firstName;
         return this;
     }
 
-    public UserBuilder lastName(
-                            String lastName) {
-        this.lastName = lastName;
+    public UserBuilder age(int age) {
+        this.age = age;
         return this;
-    }
-}
+    }    
 ```
 
 </div> 
 <div>
 
 ```java
-    public UserBuilder age(int age) {
-        this.age = age;
+    public UserBuilder lastName(
+                    String lastName) {
+        this.lastName = lastName;
         return this;
     }
 
-    public UserBuilder email(String email) {
+    public UserBuilder email(
+                    String email) {
         this.email = email;
-        return this;
-    }
-
-    public UserBuilder address(String address) {
-        this.address = address;
         return this;
     }
 
     public User build() {
         return new User(firstName, 
                         lastName, age, 
-                        email, address);
+                        email);
     }
+}
 ```
 
 </div>
@@ -2638,28 +2638,28 @@ public class UserBuilder {
 ```java
 @Test
 void testUserCreationWithBuilder() {
-    User user = new UserBuilder()
+    User user 
+        = new UserBuilder().age(30)
             .firstName("John")
             .lastName("Doe")
-            .age(30)
             .email("john.doe@example.com")
-            .address("123 Main St")
             .build();
 
-    assertEquals("John", user.getFirstName());
-    assertEquals("Doe", user.getLastName());
+    assertEquals("John", 
+                    user.getFirstName());
+    assertEquals("Doe", 
+                    user.getLastName());
+
     assertEquals(30, user.getAge());
     assertEquals("john.doe@example.com", 
-                                user.getEmail());
-    assertEquals("123 Main St", 
-                                user.getAddress());
+                        user.getEmail());
 }
 ```
 
 </div> 
 <div>
 
-- **Lisibilité améliorée** : La construction plus claire grâce aux appels enchaînés.
+- **Lisibilité améliorée** : Construction plus claire grâce aux appels enchaînés.
 - **Évite les constructeurs avec trop de paramètres** : Plus besoin de se rappeler de l'ordre des paramètres d'un constructeur.
 - **Facilité d'ajout de nouveaux attributs** : Il suffit d'ajouter une nouvelle méthode dans UserBuilder, sans casser le code existant.
 - **Meilleure réutilisation et maintenabilité des tests** : On peut créer une méthode createDefaultUser() qui retourne un utilisateur préconfiguré avec le Builder.
@@ -2667,7 +2667,13 @@ void testUserCreationWithBuilder() {
 </div>
 
 ---
-# Tests unitaires et Mock
+
+<!-- _class: cite --> 
+
+Un **Mock** est un objet simulé qui **imite le comportement d'un composant réel** dans un test unitaire. Il est utilisé pour **remplacer des dépendances**  (comme une base de données, une API, un service externe) afin de tester un module de manière isolée.
+
+---
+# La librairie Mockito
 
 ```xml
 <dependency>
@@ -2685,7 +2691,9 @@ void testUserCreationWithBuilder() {
 ```
 
 ---
-# Utilité d'un Mock
+# Nécéssité d'un Mock
+
+Comment tester PaymentService **sans tester PaymentGateway** ?
 
 ```java
 public class PaymentService {
@@ -2703,53 +2711,40 @@ public class PaymentService {
 ```
 
 ---
-# Mock et JUnit5
+# Utiliser Mockito avec JUnit5
 
 ```java
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest {
-
     @Mock
     private PaymentGateway mockPaymentGateway; // Création du mock du PaymentGateway
 
     @InjectMocks
-    private PaymentService paymentService;
+    private PaymentService paymentService; // Association du mock avec paymentService
 
     @Test
     void testProcessOrderPayment_successfulPayment() {
-        // Arrange : Préparer le mock pour qu'il retourne true, signifiant que le paiement est réussi
         Order order = new Order(100.0, "Laptop");
         when(mockPaymentGateway.processPayment(order)).thenReturn(true);
-
-        // Act : Appeler la méthode à tester
         String result = paymentService.processOrderPayment(order);
 
-        // Assert : Vérifier que le message de succès est retourné
         assertEquals("Payment Successful", result, "Le paiement devrait être réussi");
-
         Mockito.verify(mockPaymentGateway, times(1)).processPayment(order);
     }
 ```
 
 ---
-# Couverture de tests
+<!-- _class: cite --> 
 
-La couverture de tests mesure le pourcentage de code exécuté lors des tests. 
-Des outils comme JaCoCo permettent d'analyser cette couverture.
+La **couverture de tests** mesure le pourcentage de code exécuté lors des tests. Des outils comme **JaCoCo** permettent d'analyser cette couverture. 
 
-Bien que des tests avec une bonne couverture de code puissent 
-aider à détecter des erreurs, la couverture à 100% ne 
-garantit pas un code sans erreur. 
-Il est également important de tester des cas d'usage réels, 
-des scénarios extrêmes et des comportements non trivials 
-pour garantir la robustesse du code.
+La couverture à 100% **ne garantit pas un code sans erreur**. Il reste important de tester des cas d'usage réels et des scénarios non triviaux pour garantir la robustesse du code.
 
 ---
-# Boîte noire - Boîte blanche
+# Couverture de tests : Tests en boite noire ou boite blanche
 
 ```java
 public class PasswordValidator {
-
     public boolean isValid(String password) {
         if (password == null || password.length() < 8) {
             return false;
@@ -2766,9 +2761,8 @@ public class PasswordValidator {
     }
 }
 ```
-
 ---
-# Boîte noire
+# Couverture de tests : Tests en boite noire
 
 <div class="columns">
 <div> 
@@ -2776,32 +2770,39 @@ public class PasswordValidator {
 ```java
 @Test
 void testValidPasswords() {
-    assertTrue(validator.isValid("SecureP@ss123"));
-    assertTrue(validator.isValid("Hello123"));
+    assertTrue(
+        validator.isValid("SecureP@ss123"));
+    assertTrue(
+        validator.isValid("Hello123"));
 }
 
 @Test
 void testInvalidPasswords() {
     assertFalse(validator.isValid(null));
     assertFalse(validator.isValid("short"));
-    assertFalse(validator.isValid("alllowercase"));
-    assertFalse(validator.isValid("ALLUPPERCASE"));
-    assertFalse(validator.isValid("12345678"));
+    assertFalse(
+        validator.isValid("alllowercase"));
+    assertFalse(
+        validator.isValid("ALLUPPERCASE"));
+    assertFalse(
+        validator.isValid("12345678"));
 }
 ```
 
 </div> 
 <div>
 
-Les tests boîte noire se basent uniquement sur les entrées et sorties du programme. On ne regarde pas le code interne.
+Les tests boîte noire se basent **uniquement** sur les **entrées et sorties** du programme. 
+
+La structure interne du code est ignorée.
 
 </div>
 </div>
 
 ---
-# Boîte blanche
+# Couverture de tests : Tests en boite blanche
 
-Examiner le code source pour s'assurer que toutes les branches sont couvertes.
+On **examine le code** source pour s'assurer que **toutes les branches** sont couvertes.
 
 <div class="columns">
 <div> 
@@ -2847,28 +2848,18 @@ void testValidPassword() {
 </div>
 
 ---
-# Boite noire versus boite blanche
+# Boite noire ou boite blanche ?
 
-- Les tests boites noires garantissent que le programme respecte ses spécifications.
-- Les tests boite blanches s'assurent que chaque instruction a été exécutée au moins une fois.
-- Les deux types de tests sont complémentaires et doivent être utilisés ensemble pour garantir un logiciel robuste. 
-
-
----
-# Tests d'intégration
+- Les tests **boites noires** garantissent que le programme **respecte ses spécifications**.
+- Les tests **boite blanches** s'assurent que **chaque instruction** a été **exécutée** au moins une fois.
+- Les deux types de tests sont **complémentaires** et doivent être utilisés ensemble pour garantir un logiciel robuste. 
 
 ---
-# Tests fonctionnels
+<!-- _class: cite --> 
 
-Un test fonctionnel est un test qui vérifie que le logiciel répond aux exigences métier et aux spécifications fonctionnelles.
+Un **test fonctionnel** est un test qui vérifie que le logiciel répond aux **exigences métier** et aux **spécifications fonctionnelles**.
 
-Tests fonctionnels = vérification des fonctionnalités définies par les cas d'utilisation.
-
-### Objectifs des tests fonctionnels :
-
-- S'assurer que chaque fonctionnalité fonctionne comme attendu.
-- Tester le comportement externe du logiciel, sans se soucier de son implémentation interne.
-- Vérifier les entrées et sorties pour divers cas d'utilisation.
+Autrement dit les tests fonctionnels vérifient que le logiciel respecte les fonctionnalités définies par les **cas d'utilisation**.
 
 ---
 # Tests fonctionnels déduit d'un diagramme d'activités
@@ -2912,6 +2903,11 @@ Tests fonctionnels = vérification des fonctionnalités définies par les cas d'
 | **ID Test** | **Scénario** | **Étapes** | **Données d’entrée** | **Résultat attendu** |
 |-------------|--------------|------------|----------------------|----------------------|
 | TF-004 | Tentatives limitées (moins de 3) | 1. Essayer 2 fois avec un mot de passe incorrect <br> 2. Vérifier si le compte n'est pas bloqué | Identifiant : `user123` <br> Mot de passe : `wrongpass` (x2) | Affichage du message d'erreur sans blocage du compte |
+
+---
+<!-- _class: transition -->  
+
+Difficultés associées aux tests d'une application
 
 ---
 # Problème du grand nombre de cas de tests
