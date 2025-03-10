@@ -2939,16 +2939,479 @@ Difficultés associées aux tests d'une application
 
 <!-- _class: transition2 -->  
 
+Retour sur l'Observateur-Observé
+
+---
+# Principe et implémentation
+
+- **Principe du pattern Observateur-Observé** : permet à un **objet observé** de notifier automatiquement ses **observateurs** lorsqu'un changement d'état se produit.  
+
+- **Acteurs principaux** :  
+  - **Observé (Subject)** : détient l’état et notifie les observateurs en cas de modification.  
+  - **Observateurs (Observers)** : s’abonnent à l’observé et réagissent aux notifications.  
+
+---
+# Principe et implémentation
+
+- **Fonctionnement** :  
+  1. Un **observateur** s’enregistre auprès de l’**observé**.  
+  2. L’**observé** détecte un changement et **notifie** tous ses observateurs.  
+  3. Chaque **observateur** met à jour son état en fonction des informations reçues.  
+
+- **Approches de notification** :  
+  - **Push** : l’observé envoie directement les nouvelles données aux observateurs.  
+  - **Pull** : l’observé informe juste du changement, et les observateurs viennent récupérer les données.  
+
+---
+# Principe et implémentation
+
+- **Avantages** :  
+  - Découplage entre l’émetteur et les récepteurs.  
+  - Facilite la mise à jour dynamique des composants.  
+
+- **Exemples d'utilisation** :  
+  - Mise à jour automatique des interfaces graphiques (ex. JavaFX, Swing).  
+  - Communication entre modules dans une architecture logicielle (ex. MVC).  
+  - Gestion d'événements dans les systèmes réactifs.  
+
+---
+# Implémentation standard : java.util
+
+- **`Observable` (classe à observer)** :  
+  - Permet de **gérer une liste d'observateurs**.  
+  - Offre des méthodes pour :  
+    - **Ajouter** (`addObserver(Observer o)`) et **supprimer** (`deleteObserver(Observer o)`) des observateurs.  
+    - **Notifier** les observateurs (`notifyObservers()` ou `notifyObservers(Object arg)`).  
+    - **Marquer un changement** avant la notification (`setChanged()`).  
+
+- **`Observer` (interface des observateurs)** :  
+  - Définit une seule méthode :  
+    - `update(Observable o, Object arg)`, appelée lorsqu'un changement est détecté.  
+---
+# Implémentation standard est dépréciée
+
+Une classe ou une méthode est marquée **@Deprecated** pour plusieurs raisons :
+
+- Problèmes de **sécurité** : L'élément peut être vulnérable (ex: `Thread.stop()` qui cause des incohérences).
+- **Performance** insuffisante : Une meilleure solution existe (ex: `StringBuffer` remplacé par `StringBuilder`).
+- Code **obsolète** : L’élément ne correspond plus aux bonnes pratiques actuelles.
+- **Évolution** de l’API : Un remplacement plus moderne est disponible.
+
+---
+# Implémentation standard est dépréciée
+
+```java
+@Deprecated(since="9")
+public class Observable {
+```
+
+This class and the Observer interface have been deprecated. The event model supported by Observer and Observable is quite limited, **the order of notifications** delivered by Observable is **unspecified**, and **state changes are not in one-for-one correspondence with notifications**. For a richer event model, **consider using the java.beans package**.
+
+---
+# Implémentation standard est dépréciée
+
+- **Limitations et obsolescence** :  
+  - Depuis **Java 9**, `Observable` et `Observer` sont **dépréciés** car :  
+    - **Trop rigides** et difficiles à étendre.  
+    - **Peu compatibles avec la programmation réactive**.  
+  - **Alternatives recommandées** :  
+    - **`PropertyChangeListener` / `PropertyChangeSupport`** pour la gestion fine des événements.  
+
+---
+# Implémentation via java.beans
+
+### **🔹 `PropertyChangeListener` (interface d'écouteur)**
+- Interface fonctionnelle définissant une seule méthode :  
+  - `void propertyChange(PropertyChangeEvent evt)`: appelée lorsqu'une propriété change.  
+
+### **🔹 `PropertyChangeSupport` (mécanisme de gestion d'événements)**
+- Classe facilitant la gestion des **écouteurs (`PropertyChangeListener`)**.  
+- Offre des méthodes pour :  
+  - **Ajouter** un écouteur : `addPropertyChangeListener(PropertyChangeListener listener)`.  
+  - **Supprimer** un écouteur : `removePropertyChangeListener(PropertyChangeListener listener)`.  
+  - **Notifier** un changement de propriété : `firePropertyChange(String propertyName, Object oldValue, Object newValue)`.  
+
+---
+# JavaFX et Property
+
+- **Les `Property` en JavaFX** permettent de gérer **les changements d’état des objets** et facilitent le **Binding**.  
+
+### **🔹 Types de `Property` en JavaFX**
+- JavaFX fournit plusieurs types de `Property` pour différents types de données :  
+  - `IntegerProperty`, `DoubleProperty`, `BooleanProperty`, `StringProperty` pour les types primitifs.  
+  - `ObjectProperty<T>` pour les objets.  
+
+---
+# JavaFX et Property
+
+### **🔹 Exemple d'utilisation**
+```java
+IntegerProperty compteur = new SimpleIntegerProperty(0);
+compteur.addListener((obs, oldVal, newVal) -> 
+    System.out.println("Nouvelle valeur : " + newVal));
+compteur.set(10); // Affiche : Nouvelle valeur : 10
+```
+
+---
+# JavaFX et Property
+
+### **🔹 Fonctionnalités principales**
+- **Stocke une valeur** comme un attribut classique.  
+- **Est observable** : permet d’écouter les changements de valeur.  
+- **Peut être liée (`Binding`)** à d'autres propriétés pour mettre à jour automatiquement les valeurs.  
+
+---
+# JavaFX et Property
+
+### **🔹 Méthodes clés**
+- `get()` : retourne la valeur de la propriété.  
+- `set(newValue)` : modifie la valeur et notifie les observateurs.  
+- `addListener(ChangeListener<? super T> listener)` : écoute les changements de valeur.  
+- `bind(ObservableValue<? extends T> other)` : lie la propriété à une autre (valeur mise à jour automatiquement).  
+- `unbind()` : supprime la liaison.  
+
+---
+
+<!-- _class: transition2 -->  
+
 Architecture et gestion de projet<br>
 MVC et ses variantes
 
 --- 
+ <!-- _class: cite -->        
 
-<div>         
- 
-![h:450px](./img/work-in-progress.jpeg)
-   
+En informatique, un **patron d’architecture** est une solution générale et réutilisable à un problème d’architecture récurrent. Les patrons d’architecture sont **semblables aux patrons de conception** mais ont une **portée plus large**. Ils servent de modèle de référence et de **source d’inspiration** lors de la conception de l’architecture d’un système ou d’un logiciel informatique, pour décomposer celui-ci en éléments plus simples.
+
+---
+# Illustrer une architecture via un exemple simplifié
+
+- L'application implémentée est **simple** pour mieux comprendre les différences entre les architectures.  
+- Elle génère un **nombre entier aléatoire** compris entre **0 et 50**.  
+
+---
+# Exemple simplifié : la vue
+
+<div class="columns-center">
+<div> 
+
+La vue est composée de trois éléments :
+- un bouton à usage unique
+- un cercle de couleur
+- un nombre entier
+
+La valeur et la couleur affichée change après une pression sur le bouton de l’interface.
+
 </div> 
+<div>
+
+![h:300](./img/View01.png)
+</div>
+</div>
+
+---
+# Exemple simplifié : JavaFx encapsulé dans la vue
+
+
+---
+# Exemple simplifié : le modèle
+
+<div class="columns-center">
+<div> 
+
+Le modèle de l’application est composé d’un nombre entier qui prend la valeur 42 lors de l’initialisation du modèle. Une méthode compute permet de demander au modèle de générer un nombre aléatoire entre 0 et 50 pour remplacer la valeur initiale.
+</div> 
+<div>
+
+![h:400](./img/Model01.png)
+
+</div>
+</div>
+
+---
+# Exemple simplifié : Date Tranfert Object
+
+Le transfert des données est effectué dans les différentes architectures par des DTO. Afin de garder le logiciel le plus simple possible, nous utiliserons des entiers et des String pour jouer le rôle de DTO.
+
+---
+# Exemple simplifié : Repository
+
+![h:450](./img/repository01.png)
+
+---
+# Architecture de base : 3-tiers
+
+<div class="columns-center">
+<div> 
+
+- **couche présentation** : gère l’affichage des
+données pour l’utilisateur et capte les inter-
+actions avec celui-ci ;
+- **couche métier** : traite les données de l’ap-
+plication, cette couche contient la logique de
+l’application ;
+- **couche d’accès aux données** : gère l’accès
+et la persistance des données.
+
+</div> 
+<div>
+
+![h:400](./img/3TiersSchema.png)
+
+</div>
+</div>
+
+---
+# Architecture 3-tiers : Diagramme de classes
+
+<div class="columns-center">
+<div> 
+
+![h:350](./img/3tiers-classes.png)
+
+</div> 
+<div>
+
+- La **vue dépend du Modèle**.
+- La vue donne des ordres au Modèle.
+- Lorsqu’un utilisateur clique sur un bouton de l’interface, la couche présentation appelle une méthode de la couche métier.
+- La couche métier, si elle a besoin d’accéder à des données persistées, appelle des méthodes de la couche d’accès aux données.
+- Chaque couche communique avec la couche inférieure via des méthodes échangeant des DTO (Data Transfer Object).
+
+</div>
+</div>
+
+---
+# Architecture 3-tiers
+
+- Grâce à une définition claire des rôles et des interfaces de communication, chaque couche peut évoluer **sans impacter les autres**.
+- La couche d’accès aux données peut être implémentée avec le patron Repository, qui utilise des DTOs pour la communication.
+- Dans l’implémentation du projet ThreeLayers, **la vue est active** : elle donne directement des ordres au modèle logique.
+
+---
+# Modèle-vue-contrôleur
+
+<div class="columns-center" >
+<div> 
+
+- **le modèle** : contient la logique métier, elle traite les données de l’application
+- **les vues** : présentation visuelle de l’état du modèle
+- **les contrôleurs** : déclencheurs d’actions à effectuer sur le modèle et/ou sur une vue
+
+</div> 
+<div>
+
+![h:400](./img/MVCSchema.png)
+
+</div>
+</div>
+
+---
+# MVC : Diagramme de classes
+
+<center>
+
+![h:450](./img/mvc-classes.png)
+
+</center>
+
+---
+# MVC : couche accès au données
+
+- Le **patron MVC ne mentionne pas explicitement l'accès aux données** :  
+  - En réalité, cette responsabilité est intégrée dans le modèle.  
+  - Le modèle peut accéder aux données via un **Repository**.  
+  - Par souci de simplicité, ce Repository sera omis dans la suite.  
+
+</div>
+</div>
+
+---
+# MVC
+
+- Ce découpage permet **d’isoler les différentes parties du logiciel**, limitant ainsi l'impact des modifications sur les autres parties.  
+- Dans une **architecture trois-tiers**, la gestion de **plusieurs vues** peut devenir complexe.  
+  - Cette complexité vient du fait que la **vue est active** et dirige le modèle.  
+  - Lorsqu'une vue met à jour une donnée, elle doit ensuite informer **toutes les autres vues**, ce qui peut devenir contraignant.  
+- Pour résoudre ce problème, le **MVC** utilise le **patron Observateur-Observé** :  
+  - Lorsque le modèle met à jour une donnée, **il notifie automatiquement toutes les vues**.  
+
+---
+# MVC : Dépendances
+
+- la **vue** dépend **faiblement** du **modèle** via l’Observateur-Observé
+- le **contrôleur** est **fortement** dépendant de la vue et du modèle
+- la vue met à la disposition du contrôleur des méthodes pour mettre à jour l’affichage (disableBouton, setColorYellow, setNumber)
+- le contrôleur est responsable de lier le modèle à la vue via la méthode addObserver
+
+---
+# MVC : Tests unitaires
+
+- le **Modèle** contient la logique métier et **doit être testé unitairement** ;
+- le **Contrôleur** contient les algorithmes qui interprètent les actions de l’utilisateur et
+**doit être testé unitairement**. Il faut recourir au **Mock** de la Vue et du Modèle
+- la méthode **update** de la **Vue** contient la logique de mise à jour et **doit être testée unitairement**. Ce qui n’est malheureusement **pas possible** de manière simple
+
+---
+# MVC : Popularité
+
+Le patron d’architecture MVC est assez **populaire**. On peut notamment le rencontrer dans des applications développées via les frameworks **Ruby on Rails, Spring, Struts, Symfony, Laravel, ou AngularJs**
+
+---
+# Modèle-Vue-Présentation
+
+<div class="columns-center">
+<div> 
+
+- le **Modèle** : contient la logique métier, elle
+traite les données de l’application ;
+- les **Vues** : présentation visuelle de l’état du
+modèle ;
+- la **Présentation** : déclencheurs d’actions à
+effectuer sur le modèle et/ou sur une vue
+
+</div> 
+<div>
+
+![h:400](./img/MVPSchema.png)
+
+</div>
+</div>
+
+---
+# MVP : Diagramme de classes
+
+<center>
+
+![h:450](./img/mvp-classes.png)
+
+</center>
+
+---
+# MVP : Dépendances
+
+- la Vue ne dépend pas du Modèle
+- la Présentation dépend de la Vue et du Modèle
+- la Présentation est abonnée aux notifications du Modèle via l’Observateur-Observé
+- la Vue met à disposition de la Présentation des méthodes pour mettre à jour l’affichage (disableBouton, setColorYellow, setNumber)
+
+---
+# MVP
+
+- Le **MVP** élimine l’interaction directe entre la **Vue** et le **Modèle**.  
+- La **Présentation** prend en charge la gestion des interactions entre ces deux composants.  
+- Dans cette architecture :  
+  - La **Vue est passive** et ne donne plus aucun ordre.  
+  - La **Vue ne contient plus de logique**.  
+
+---
+# MVP : Tests unitaires
+
+- le **modèle** contient la logique métier et **doit être testé unitairement**
+- la **présentation** contient les algorithmes qui interprètent les actions de l’utilisateur et **doit être testé unitairement**. Il faut recourir au **Mock** de la vue et du modèle
+- la vue ne contient plus de logique et ne doit pas être testée unitairement
+
+---
+# MVP : Popularité
+
+On retrouve fréquemment l’utilisation de ce patron d’architecture dans des applications **Android, .NET**.
+
+---
+# Modèle-Vue-Vue-modèle
+
+<div class="columns-center">
+<div> 
+
+- **Modèle** : contient la logique métier, elle traite
+les données de l’application ;
+- **Vues** : présentation visuelle de l’état du modèle ;
+- **Vue-modèle** : gère les actions de l’utilisateur et modifie l’affichage via le système de Binding. Certains de ses attributs sont des conteneurs des valeurs affichées dans les vues.
+
+</div> 
+<div>
+
+![h:200](./img/MVVMSchema.png)
+
+</div>
+</div>
+
+---
+# MVVM
+
+- Lorsqu'une **vue** affiche un nombre entier avec `javafx.scene.text.Text` :  
+  - La valeur de cet entier est stockée dans un **attribut du Vue-modèle**.  
+  - Cet attribut est un **Observable**, et son Observateur est l'instance `Text` de la vue.  
+
+- **Objectif** : éviter de coder manuellement les mises à jour de la vue.  
+  - Dès qu’un attribut du **Vue-modèle** est modifié, le composant associé dans la **vue** se met automatiquement à jour.  
+
+---
+# MVVM : Binding
+
+- Cette architecture repose sur le **Binding**, qui est dépendant des bibliothèques utilisées pour la gestion de la vue.  
+  - En **JavaFX**, les composants standards (`Button`, `Label`, `TextField`...) prennent en charge le **Binding** facilement.  
+  - **Problème** : certains composants ne supportent pas le **Binding** nativement.  
+  - **Solution** : implémenter manuellement le **Binding** dans l'application.  
+
+---
+# MVVM : Diagramme de classes
+
+<center>
+
+![h:450](./img/mvvm-classes.png)
+
+</center>
+
+---
+# MVVM : Dépendances
+
+- la Vue dépend faiblement du Vue-modèle via le binding
+- le Vue-modèle ne dépend pas de la Vue
+- le Vue-modèle dépend du Modèle
+- le Vue-modèle possède des attributs qui reflètent la Vue : la valeur de l’entier, le style associé au cercle, la statut du bouton
+- le Vue-modèle est abonnée aux notifications du Modèle via l’Observateur-Observé
+- le Vue-modèle dépend de l’existence d’attributs Observable, nommé Property dans le cas de JavaFX
+
+---
+# MVVM : Tests unitaires
+
+- le **Modèle** contient la logique métier et **doit être testé unitairement**
+- le **Vue-modèle** contient les algorithmes qui interprètent les actions de l’utilisateur et **doit être testé unitairement**. Il faut recourir au **Mock** du Modèle uniquement ;
+- la Vue ne contient plus de logique et ne doit pas être testée unitairement
+
+---
+# MVVM : Popularité
+
+Actuellement on retrouve notamment l’utilisation de ce patron d’architecture dans les applications **Vue.js** ou encore **Android**.
+
+---
+# Autres Architecture
+
+- **Microservices** : Architecture qui décompose une application en plusieurs services indépendants, chacun responsable d'une fonctionnalité spécifique, communiquant entre eux via des API.  
+- **Hexagonal** : Architecture centrée sur le domaine métier, où le modèle est indépendant des interfaces utilisateur et des systèmes externes, facilitant ainsi les tests et l'évolution.  
+- **Client-serveur** : Architecture où un serveur central fournit des ressources ou des services à des clients qui en font la demande via un réseau.  
+
+
+---
+
+ <!-- _class: cite -->    
+
+**Loi de Conway**
+
+Toute organisation qui conçoit un système, au sens large, concevra une structure qui sera la copie de la structure de communication de l’organisation.
+
+---
+# Choix d’une architecture
+
+- Lors de l'implémentation d'une application, l'architecture choisie doit tenir compte de plusieurs critères :  
+  - **Framework adapté**  
+  - **Popularité de l'architecture** dans la technologie  
+  - **Vue active ou passive**  
+  - **Évolution de l’application** : nombre de vues fixe ou variable  
+  - **Couverture de test souhaitée**  
+
+- Il n'existe pas de classification absolue des architectures.  
+- Ces questions doivent être discutées **au début de chaque nouvelle application**.  
+
 
 ---
 <!-- _class: transition2 -->  
