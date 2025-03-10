@@ -3109,9 +3109,36 @@ La valeur et la couleur affichée change après une pression sur le bouton de l�
 </div>
 
 ---
-# Exemple simplifié : JavaFx encapsulé dans la vue
+# Exemple simplifié : Main dépend de JavaFX
 
+```java
+import javafx.application.Application;
+import javafx.stage.Stage;
 
+public class Main extends Application {
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage stage) {
+        ...
+        stage.setScene(scene);
+        stage.show();
+    }
+```
+---
+# Exemple simplifié : View encapsule JavaFX
+
+```java
+  public View() {
+        Platform.startup(() -> {
+            Stage stage = new Stage();
+            ...
+            stage.setScene(scene);
+            stage.show();
+```
 ---
 # Exemple simplifié : le modèle
 
@@ -3135,7 +3162,11 @@ Le transfert des données est effectué dans les différentes architectures par 
 ---
 # Exemple simplifié : Repository
 
+<center>
+
 ![h:450](./img/repository01.png)
+
+</center>
 
 ---
 # Architecture de base : 3-tiers
@@ -3143,14 +3174,16 @@ Le transfert des données est effectué dans les différentes architectures par 
 <div class="columns-center">
 <div> 
 
-- **couche présentation** : gère l’affichage des
+### Composants : 
+
+- **Couche présentation** : gère l’affichage des
 données pour l’utilisateur et capte les inter-
-actions avec celui-ci ;
-- **couche métier** : traite les données de l’ap-
+actions avec celui-ci
+- **Couche métier** : traite les données de l’ap-
 plication, cette couche contient la logique de
-l’application ;
-- **couche d’accès aux données** : gère l’accès
-et la persistance des données.
+l’application
+- **Couche d’accès aux données** : gère l’accès
+et la persistance des données
 
 </div> 
 <div>
@@ -3193,9 +3226,11 @@ et la persistance des données.
 <div class="columns-center" >
 <div> 
 
-- **le modèle** : contient la logique métier, elle traite les données de l’application
-- **les vues** : présentation visuelle de l’état du modèle
-- **les contrôleurs** : déclencheurs d’actions à effectuer sur le modèle et/ou sur une vue
+### Composants : 
+
+- **Le modèle** : contient la logique métier, elle traite les données de l’application
+- **Les vues** : présentation visuelle de l’état du modèle
+- **Les contrôleurs** : déclencheurs d’actions à effectuer sur le modèle et/ou sur une vue
 
 </div> 
 <div>
@@ -3238,18 +3273,18 @@ et la persistance des données.
 ---
 # MVC : Dépendances
 
-- la **vue** dépend **faiblement** du **modèle** via l’Observateur-Observé
-- le **contrôleur** est **fortement** dépendant de la vue et du modèle
-- la vue met à la disposition du contrôleur des méthodes pour mettre à jour l’affichage (disableBouton, setColorYellow, setNumber)
-- le contrôleur est responsable de lier le modèle à la vue via la méthode addObserver
+- La **vue** dépend **faiblement** du **modèle** via l’Observateur-Observé
+- Le **contrôleur** est **fortement** dépendant de la vue et du modèle
+- La vue met à la disposition du contrôleur des méthodes pour mettre à jour l’affichage (disableBouton, setColorYellow, setNumber)
+- Le contrôleur est responsable de lier le modèle à la vue via la méthode addObserver
 
 ---
 # MVC : Tests unitaires
 
-- le **Modèle** contient la logique métier et **doit être testé unitairement** ;
-- le **Contrôleur** contient les algorithmes qui interprètent les actions de l’utilisateur et
+- Le **Modèle** contient la logique métier et **doit être testé unitairement** ;
+- Le **Contrôleur** contient les algorithmes qui interprètent les actions de l’utilisateur et
 **doit être testé unitairement**. Il faut recourir au **Mock** de la Vue et du Modèle
-- la méthode **update** de la **Vue** contient la logique de mise à jour et **doit être testée unitairement**. Ce qui n’est malheureusement **pas possible** de manière simple
+- La méthode **update** de la **Vue** contient la logique de mise à jour et **doit être testée unitairement**. Ce qui n’est malheureusement **pas possible** de manière simple
 
 ---
 # MVC : Popularité
@@ -3262,11 +3297,11 @@ Le patron d’architecture MVC est assez **populaire**. On peut notamment le ren
 <div class="columns-center">
 <div> 
 
-- le **Modèle** : contient la logique métier, elle
-traite les données de l’application ;
-- les **Vues** : présentation visuelle de l’état du
-modèle ;
-- la **Présentation** : déclencheurs d’actions à
+- Le **Modèle** : contient la logique métier, elle
+traite les données de l’application
+- Les **Vues** : présentation visuelle de l’état du
+modèle
+- La **Présentation** : déclencheurs d’actions à
 effectuer sur le modèle et/ou sur une vue
 
 </div> 
@@ -3289,13 +3324,13 @@ effectuer sur le modèle et/ou sur une vue
 ---
 # MVP : Dépendances
 
-- la Vue ne dépend pas du Modèle
-- la Présentation dépend de la Vue et du Modèle
-- la Présentation est abonnée aux notifications du Modèle via l’Observateur-Observé
-- la Vue met à disposition de la Présentation des méthodes pour mettre à jour l’affichage (disableBouton, setColorYellow, setNumber)
+- La **Vue ne dépend** pas du **Modèle**
+- La **Présentation** **dépend** de la Vue et du Modèle
+- La **Présentation** est abonnée aux notifications du Modèle via l’**Observateur-Observé**
+- La Vue met à disposition de la Présentation des méthodes pour mettre à jour l’affichage (disableBouton, setColorYellow, setNumber)
 
 ---
-# MVP
+# MVP : bilan
 
 - Le **MVP** élimine l’interaction directe entre la **Vue** et le **Modèle**.  
 - La **Présentation** prend en charge la gestion des interactions entre ces deux composants.  
@@ -3306,9 +3341,9 @@ effectuer sur le modèle et/ou sur une vue
 ---
 # MVP : Tests unitaires
 
-- le **modèle** contient la logique métier et **doit être testé unitairement**
-- la **présentation** contient les algorithmes qui interprètent les actions de l’utilisateur et **doit être testé unitairement**. Il faut recourir au **Mock** de la vue et du modèle
-- la vue ne contient plus de logique et ne doit pas être testée unitairement
+- Le **modèle** contient la logique métier et **doit être testé unitairement**
+- La **présentation** contient les algorithmes qui interprètent les actions de l’utilisateur et **doit être testé unitairement**. Il faut recourir au **Mock** de la vue et du modèle
+- La vue ne contient plus de logique et ne doit pas être testée unitairement
 
 ---
 # MVP : Popularité
@@ -3322,8 +3357,8 @@ On retrouve fréquemment l’utilisation de ce patron d’architecture dans des 
 <div> 
 
 - **Modèle** : contient la logique métier, elle traite
-les données de l’application ;
-- **Vues** : présentation visuelle de l’état du modèle ;
+les données de l’application
+- **Vues** : présentation visuelle de l’état du modèle
 - **Vue-modèle** : gère les actions de l’utilisateur et modifie l’affichage via le système de Binding. Certains de ses attributs sont des conteneurs des valeurs affichées dans les vues.
 
 </div> 
@@ -3335,7 +3370,7 @@ les données de l’application ;
 </div>
 
 ---
-# MVVM
+# MVVM : Binding
 
 - Lorsqu'une **vue** affiche un nombre entier avec `javafx.scene.text.Text` :  
   - La valeur de cet entier est stockée dans un **attribut du Vue-modèle**.  
@@ -3364,19 +3399,19 @@ les données de l’application ;
 ---
 # MVVM : Dépendances
 
-- la Vue dépend faiblement du Vue-modèle via le binding
-- le Vue-modèle ne dépend pas de la Vue
-- le Vue-modèle dépend du Modèle
-- le Vue-modèle possède des attributs qui reflètent la Vue : la valeur de l’entier, le style associé au cercle, la statut du bouton
-- le Vue-modèle est abonnée aux notifications du Modèle via l’Observateur-Observé
-- le Vue-modèle dépend de l’existence d’attributs Observable, nommé Property dans le cas de JavaFX
+- La **Vue** dépend **faiblement** du Vue-modèle via le **binding**
+- Le **Vue-modèle** ne dépend pas de la Vue
+- Le **Vue-modèle** dépend du **Modèle**
+- Le **Vue-modèle** possède des attributs qui reflètent la Vue : la valeur de l’entier, le style associé au cercle, la statut du bouton
+- Le **Vue-modèle** est abonnée aux notifications du Modèle via l’Observateur-Observé
+- Le **Vue-modèle** dépend de l’existence d’attributs Observable, nommé Property dans le cas de JavaFX
 
 ---
 # MVVM : Tests unitaires
 
-- le **Modèle** contient la logique métier et **doit être testé unitairement**
-- le **Vue-modèle** contient les algorithmes qui interprètent les actions de l’utilisateur et **doit être testé unitairement**. Il faut recourir au **Mock** du Modèle uniquement ;
-- la Vue ne contient plus de logique et ne doit pas être testée unitairement
+- Le **Modèle** contient la logique métier et **doit être testé unitairement**
+- Le **Vue-modèle** contient les algorithmes qui interprètent les actions de l’utilisateur et **doit être testé unitairement**. Il faut recourir au **Mock** du Modèle uniquement
+- La Vue ne contient plus de logique et ne doit pas être testée unitairement
 
 ---
 # MVVM : Popularité
