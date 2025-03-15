@@ -3453,10 +3453,283 @@ Toute organisation qui conçoit un système, au sens large, concevra une structu
 
 Présenter une analyse<br>
 
---- 
+---
+ <!-- _class: cite -->  
 
-<div>         
- 
-![h:450px](./img/work-in-progress.jpeg)
-   
+En **génie logiciel**, une **méthodologie** est un procédé qui a pour objectif de permettre de **formaliser** les **étapes du développement** d'un système afin de rendre ce développement plus **fidèle aux besoins du client**.
+
+---
+# Méthodologie
+
+- Méthode en **cascade** (Waterfall) : Processus **linéaire** et **séquentiel**, chaque phase (analyse, conception, implémentation, test, déploiement) **doit être complétée avant de passer à la suivante**.
+
+- Méthode **cyclique** (itérative/incrémentale) : Développement en **plusieurs cycles** où chaque itération produit une **version améliorée** du logiciel. 
+
+- Méthode **agile** : Approche flexible et collaborative privilégiant les **interactions fréquentes avec le client**, les livraisons **incrémentales** et l’adaptation continue.
+
+---
+# Etapes clés
+
+- **Description des besoins** : recueillir et analyser les besoins.
+
+- **Cas d'utilisations** : représenter les interactions entre les acteurs et le logiciel.
+
+- **Maquette d'écran** : Prototyper les interfaces utilisateur.
+
+- **Plan de tests fonctionnels** : Décrire les scénarios de tests permettant de valider chaque fonctionnalité.
+
+- **Diagramme de classes** : Modéliser la structure du code (classes, attributs, méthodes et relations).
+
+- **Répartition des tâches** : Organiser le travail entre les membres de l’équipe.
+
+---
+# Description des besoins
+
+**Objectif :** Comprendre ce que doit accomplir le projet.
+
+- Se concentre sur **ce que veut le client** ou les utilisateurs.
+
+- Exprime les attentes sous forme de **besoins fonctionnels** et **non fonctionnels**, souvent en **langage naturel**.
+
+- **Document initial** permettant de cadrer le projet avant de rentrer dans les détails techniques : cahier des charges.
+
+---
+# Besoins fonctionnels
+
+- Décrit ce que le **système doit faire** (ses **fonctionnalités**).
+
+- Correspond aux actions et interactions entre l'utilisateur et le logiciel.
+
+### Exemples :
+
+- Un utilisateur doit pouvoir s’inscrire et se connecter.
+- L’application doit permettre d’ajouter un produit au panier.
+
+---
+# Besoins non-fonctionnels
+
+- Décrit comment le système doit fonctionner
+
+- **Contraintes** et **qualités** attendues.
+
+- Ne concerne pas directement une fonctionnalité, mais plutôt des critères de performance, sécurité, ergonomie, etc.
+
+### Exemples :
+
+- Le site doit charger en moins de 2 secondes.
+- L’application doit être accessible sur mobile et desktop.
+- Les données des utilisateurs doivent être cryptées.
+
+---
+# Exemple : Application de gestion des étudiants 
+
+Développer une interface permettant d'ajouter des étudiants à un tableau après saisie de leurs informations dans des champs dédiés. **Les données des étudiants doivent être enregistrées dans un fichier pour assurer leur persistance**. L'interface comprendra un tableau avec trois colonnes : Matricule, Nom et Prénom. Au démarrage de l'application, les étudiants seront chargés depuis le fichier. L'application devra inclure une gestion des erreurs, notamment en empêchant l'ajout d'un étudiant si un champ est vide. Enfin, elle devra permettre la suppression d'un étudiant existant.
+
+---
+# Spécification via des cas d'utilisation
+
+**Définir les interactions entre utilisateurs et système**
+
+Un cas d’utilisation comprend généralement :
+
+- **Acteurs** : Utilisateurs ou systèmes interagissant avec l’application.
+- **Scénario principal** (nominal) : Séquence d’actions entre l’acteur et le système.
+- **Exceptions** / **Alternatives** : Déviations possibles du scénario principal.
+- **Conditions** : pré, post, invariable.
+
+**Avantages** : Clarifie les exigences fonctionnelles, facilite la communication entre équipes.
+
+---
+# Exemple : Application de gestion des étudiants 
+
+<div class="columns">
+<div> 
+
+Le contrôleur traduit les actions utilisateur en logique applicative.
+
+- **3 cas d'utilisations - 3 méthodes du controlleur** :
+
+    - Chargement des étudiants au démarrage
+
+    - Ajout d’un étudiant
+
+    - Suppression d’un étudiant
+
+
+
 </div> 
+<div>
+
+![h:400](./img/controller-usecase.png)
+
+</div>
+</div>
+
+---
+# Maquettage des écrans
+
+<div class="columns-center">
+<div> 
+
+- Conception de l’interface utilisateur **avant le développement**
+
+- Outils : Figma, croquis papier, SceneBuilder
+
+- **Clarification** des besoins 
+
+- **Communication** avec les parties prenantes
+
+- **Réduction** des coûts et des **risques**
+
+</div> 
+<div>
+
+![h:400](./img/student-manager-view.png)
+
+</div>
+</div>
+
+---
+# Plan de Tests Fonctionnels
+
+<div class="columns">
+<div> 
+
+### Raison de l'écriture du plan de tests durant la phase d'analyse :
+
+- **Validation** des exigences
+
+- **Détection** précoce des incohérences
+
+- Meilleure **planification** du projet
+
+- Assurance **qualité** dès le départ
+
+</div> 
+<div>
+
+### Format du plan de test
+
+| ID  | Test                        | Données d’entrée | Résultat attendu                               |
+|-----|-----------------------------|-----------------|----------------------------------------------|
+| T3  | Ajout d’un étudiant valide  | Matricule: 123, Nom: "Dupont", Prénom: "Jean" | L'étudiant est ajouté au `TableView` et au fichier |
+
+</div>
+</div>
+
+
+---
+# Diagramme de Classes
+
+- **Structuration** du modèle conceptuel
+
+- Identification des **relations** et **responsabilités**
+
+- **Réduction** des **erreurs** et **meilleure planification**
+
+- Base pour l’implémentation
+
+- Correspondance entre classes et **tables**
+
+---
+# Répartition des Tâches
+
+<div class="columns">
+<div> 
+
+### Semaine 1 - 6H
+
+| Qui       | Description  
+|--         | --
+|Tous       | Analyse du projet.
+|Alice      | Initialisation de Git
+|Bob        | Configuration de l'environnement 
+
+</div> 
+<div>
+
+### Semaine 2 - 6H
+
+| Qui       | Description  
+|--         | --
+|Alice      | Implémentation de la partie OCR
+|Bob        | Implémentation de la base de données                   |
+
+</div>
+</div>
+
+
+---
+# Projet du bimestre 4
+
+- Application Java intégrant une librairie OCR
+
+- Travail en binôme
+
+- FAQ du projet
+
+- Evaluation pratique et théorique
+
+---
+# Formuler une demande d’aide claire
+
+- Titre du ticket : résumé du problème
+
+- Description détaillée du problème : résultat attendu vs résultat réel
+
+- Étapes pour reproduire le bug
+
+- Copie du message d’erreur : `Caused by`
+
+- Environnement technique
+
+- Tentatives de correction effectuées
+
+- Priorité (Critique, Majeu, Mineur, Amélioration)
+
+- [Outil comme Jira](https://www.atlassian.com/fr/software/jira) dans le milieu professionnel
+
+---
+# Exemple de ticket - Part 1
+
+**Titre** : Erreur IllegalStateException lors du chargement du fichier FXML
+
+**Description** :
+Lors du lancement de l’application via la commande maven, une exception `IllegalStateException` est levée lorsque j’essaie de charger le fichier `student-view.fxml`.  
+L’interface graphique ne s’affiche pas comme prévu.
+
+**Étapes pour reproduire :**
+1. Exécuter l’application via `mvn javafx:run`
+2. Vérifier la console pour voir le message d’erreur
+
+---
+# Exemple de ticket - Part 2
+
+**Message d’erreur :**
+
+```java
+java.lang.IllegalStateException: Location is not set. 
+at javafx.fxml.FXMLLoader.loadImpl(FXMLLoader.java:2561) at 
+javafx.fxml.FXMLLoader.load(FXMLLoader.java:2536) at be.esi.prj.
+studentmanager.view.ViewFx.lambda$new$0(ViewFx.java:23)
+```
+
+**Environnement :**
+- OS : Windows 11
+- Java : OpenJDK 17
+
+---
+# Exemple de ticket - Part 3
+
+**Tentatives de correction :**
+J’ai essayé d’utiliser `getResource("/be/esi/prj/studentmanager/view/student-view.fxml")` au lieu de `getResource("./student-view.fxml")` à la ligne 23 de la classe `ViewFx` mais l’erreur persiste.
+
+**Priorité :** Majeur
+
+---
+
+<!-- _class: transition2 -->  
+
+THANK YOU!
+
+![bg opacity:20% h:650 ](./img/OpenJdkLogo.png)
