@@ -16,7 +16,7 @@ footer      : "JLC - 4PRJ1D"
 # 4PRJ1D - Théorie
 ## Gestion de projet 1
 ### Jonathan Lechien
-#### Bruxelles, février 2025
+#### Bruxelles, février 2026
 ##### Haute École Bruxelles-Brabant : Département des Sciences Informatiques 
 
 ---        
@@ -42,7 +42,7 @@ footer      : "JLC - 4PRJ1D"
 1. *FXML et Scene Builder*
 2. *Multi Threading*
 3. *JDBC et JPA*
-4. *Librairie OCR*
+4. *Librairie externe*
    
 </div>  
 <div>    
@@ -69,7 +69,8 @@ footer      : "JLC - 4PRJ1D"
  
 <!-- _class: cite -->        
 
-L'**évaluation** repose sur un contrôle **continu** structuré autour de la réalisation d’un **projet en binôme**. Une **défense individuelle** sera organisée afin d’évaluer les aspects techniques du projet, au cours de laquelle chaque étudiant devra également répondre à une **question théorique** sur les concepts abordés en cours. 
+L'**évaluation** repose sur un contrôle **continu** structuré autour de la réalisation d’un **projet en binôme**. Les étudiants doivent **montrer l’évolution régulière** dans la réalisation des TDs et du projet : **20% de la note**. Une défense individuelle sera organisé  durant la session d'examen : **80% de la note**
+
 
 ---
 <!-- _class: transition2 -->  
@@ -3652,7 +3653,7 @@ Le contrôleur traduit les actions utilisateur en logique applicative.
 
 | Qui       | Description  
 |--         | --
-|Alice      | Implémentation de la partie OCR
+|Alice      | Intégration de la librairie
 |Bob        | Implémentation de la base de données                   |
 
 </div>
@@ -3662,7 +3663,7 @@ Le contrôleur traduit les actions utilisateur en logique applicative.
 ---
 # Projet du bimestre 4
 
-- Application Java intégrant une librairie OCR
+- Application Java intégrant une librairie fixée par les enseignants
 
 - Travail en binôme
 
