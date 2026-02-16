@@ -235,12 +235,12 @@ Dans le fichier `pom.xml`, ajoutez les dépendances suivantes :
 <dependency>
     <groupId>org.openjfx</groupId>
     <artifactId>javafx-controls</artifactId>
-    <version>17</version>
+    <version>25.0.2</version>
 </dependency>
 <dependency>
     <groupId>org.openjfx</groupId>
     <artifactId>javafx-fxml</artifactId>
-    <version>17</version>
+    <version>25.0.2</version>
 </dependency>
 ```
 
@@ -1160,843 +1160,6 @@ Thread. **JavaDoc 23**. Consulté le 8 février 2025. [https://docs.oracle.com/e
 ExecutorService. **JavaDoc 23**. Consulté le 8 février 2025. [https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/concurrent/ExecutorService.html](https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/concurrent/ExecutorService.html).
 
 Asynchronous Programming in Java using Virtual Threads. **Venkat Subramaniam**. Consulté le 8 février 2025. [https://www.youtube.com/watch?v=uoTyIFvckXA](https://www.youtube.com/watch?v=uoTyIFvckXA).
-
-
-
----
-<!-- _class: transition2 -->  
-
-Principes SOLID</br>
-&</br>
-Design patterns
-
---- 
-
-<!-- _class: cite -->        
-
-**SOLID** est un ensemble de principes pour améliorer la conception logicielle en **Programmation Orientée Objet**.
-
----
-
-# Principe SOLID
-
-5 principes introduits par Robert C. Martin
-
-- **S**ingle responsibility principle - Responsabilité unique 
-- **O**pen–closed principle - Ouvert/fermé
-- **L**iskov substitution principle - Substitution de Liskov 
-- **I**nterface segregation principle - Ségrégation des interfaces 
-- **D**ependency inversion principle - Inversion des dépendances
-
----
-
-# **S**ingle Responsibility Principle - SRP
-
-Une **classe**, une **fonction** ou une **méthode** doit avoir une et une seule **unique** raison d'être modifiée. 
-
-Cela favorise la modularité et facilite la maintenance en évitant les classes surchargées de responsabilités.
-
----
-# **S**RP - Exemple sur une classe
-
-<div class="columns">
-<div>         
-
-
-```java
-class Report {
-
-    private String content;
-
-    public void generate() {
-        content = "Rapport de ventes\n
-           ================\nTotal: 5000€\n";
-    }
-
-    public void saveToFile(String filename) {
-        try (FileWriter writer 
-                 = new FileWriter(filename)) {
-            writer.write(content);
-            System.out.println("Report saved to " 
-                + filename);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
-```
-
-</div> 
-<div>
-
-### La classe a deux responsabilités :
-
-1. Générer le rapport (logique métier)
-2. Sauvegarder le fichier (interaction avec le système de fichiers)
-
-</div>
-</div>
-
----
-# **S**RP - Exemple sur une classe
-
-<div class="columns">
-<div>         
-
-
-```java
-public class FileSaver {
-    public void saveToFile(String data,
-                          String filename) {
-        try (FileWriter writer 
-               = new FileWriter(filename)) {
-            writer.write(data);
-            System.out.println(
-                "Report saved to " 
-                + filename);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
-```
-
-</div> 
-<div>
-
-```java
-public class Report {
-    private String content;
-
-    public void generate() {
-        content = "Rapport de ventes\n
-            ================\nTotal: 5000€\n";
-    }
-
-    public String getContent() {
-        return content;
-    }
-}
-```
-</div>
-</div>
-
-- `Report` génère le rapport (logique métier)
-- `FileSaver` sauvegarde le fichier (interaction avec le système de fichiers)
-
----
-
-# **S**RP en lien avec le pattern Facade
-
-
-<div class="columns">
-<div>         
-
-```java
-public class ReportFacade {
-    private Report report;
-    private FileSaver saver;
-
-    public ReportFacade() {
-        this.report = new Report();
-        this.saver = new FileSaver();
-    }
-
-    public void generateAndSaveReport(
-            String filename) {
-
-        report.generate();
-        saver.saveToFile(
-            report.getContent(),
-                        filename); 
-    }
-}
-```
-
-</div> 
-<div>
-
-Le design pattern Facade fournit une interface simplifiée et unifiée pour **cacher la complexité** d'un sous-système, en **déléguant** les appels aux classes internes sans les exposer directement.
-
-`ReportFacade` **coordonne** les deux services.
-
-</div>
-</div>
-
----
-
-# **S**RP - Exemple sur une méthode
-
-<div class="columns">
-<div>         
-
-### Deux responsabilités par méthode
-
-```java
-void displayWinner(List<Player> players, 
-         Player currentPlayer) {
-
-    Player winner = currentPlayer;
-
-    for (Player player : players) {
-        if(player.getScore()> 100){
-            winner = player;
-        }
-    }
-
-    System.out.println("Vainqueur : " 
-        + winner.getName());
-}
-```
-
-</div> 
-<div>
-
-### Une responsabilité par méthode
-
-```java
-Player getWinner(List<Player> players, 
-         Player currentPlayer) {
-    Player winner = currentPlayer;
-    for (Player player : players) {
-        if (player.getScore() > 100) {
-            winner = player;
-        }
-    }
-    return winner;
-}
-
-void displayWinner(Player player){
-    System.out.println("Vainqueur : " 
-        + winner.getName());
-}
-```
-
-</div>
-</div>
-
----
-
-# **O**pen/Closed Principle
-
-Une classe (ou une fonction, un module ...) doit être **fermée** à la **modification** directe mais **ouverte** à l'**extension**. 
-
-L'objectif est de permettre l'ajout de nouvelles fonctionnalités **sans altérer le code existant**.
-
----
-
-# **O**pen/Closed Principle - Exemple
-
-<div class="columns">
-<div>         
-
-
-```java
-public class PaymentProcessor {
-
-    public void processPayment(String type) {
-
-        if (type.equals("credit_card")) {
-
-            System.out.println(
-               "Processing card payment...");
-
-        } else if (type.equals("payconiq")) {
-
-            System.out.println(
-               "Processing Payconiq payment...");
-               
-        }
-    }
-} 
-```
-
-</div> 
-<div>
-
-Pour ajouter le Bitcoin comme moyen de paiement, il faut modifier `PaymentProcessor`.
-
-Si une classe a été **testée** et **validé**, on ne la **modifie pas**.
-</div>
-</div>
-
----
-
-# **O**pen/Closed Principle en lien avec le pattern Strategy
-
-<div class="columns">
-<div>         
-
-```java
-interface PaymentStrategy {
-    void pay();
-}
-
-class CreditCardPayment implements PaymentStrategy {
-    public void pay() {
-
-        System.out.println(
-            "Processing credit card payment...");
-
-    }
-}
-
-class PayconiqPayment implements PaymentStrategy {
-    public void pay() {
-
-        System.out.println(
-            "Processing Payconiq payment...");
-
-    }
-}
-```
-
-</div> 
-<div>
-
-Pour ajouter un nouveau moyen de paiement il faut créer une nouvelle implémentation de `PaymentStrategy`.
-
-Le design pattern Strategy permet de définir une **famille d'algorithmes**, de les **encapsuler** et de les **interchanger dynamiquement** sans modifier le code du client, favorisant ainsi l'extensibilité.
-</div>
-</div>
-
----
-
-# **O**pen/Closed Principle en lien avec le pattern Strategy
-
-<div class="columns">
-<div>         
-
-```java
-public class PaymentProcessor {
-    private PaymentStrategy strategy;
-
-    public PaymentProcessor(
-             PaymentStrategy strategy) {
-
-        this.strategy = strategy;
-    }
-
-    public void processPayment() {
-        strategy.pay();
-    }
-
-    public void setStrategy(
-            PaymentStrategy strategy) {
-        this.strategy = strategy;
-    }
-}
-```
-
-</div> 
-<div>
-
-```java
-public static void main(String[] args) {
-
-    CreditCardPayment cardStrategy
-            = new CreditCardPayment();
-
-    PaymentProcessor processor
-            = new PaymentProcessor(
-                cardStrategy);
-
-    processor.processPayment();
-
-    PayconiqPayment payconiqStrategy
-            = new PayconiqPayment();
-
-    processor.setStrategy(payconiqStrategy);
-
-    processor.processPayment();
-}
-```
-</div>
-</div>
-
-
----
-
-# Liskov Substitution Principle 
-
-Une instance de type T doit pouvoir être remplacée par une instance de type G, tel que G sous-type de T, sans que cela ne modifie la cohérence du programme. 
-Cela garantit que les sous-classes peuvent être utilisées de manière interchangeable avec leurs classes de base.
-
-L'extension d'une classe **ne doit pas modifier le comportement attendu des méthodes remplacées**.
-
----
-
-# Liskov Substitution Principle  - Exemple
-
-<div class="columns">
-<div>         
-
-```java
-class Rectangle {
-    protected int width, height;
-
-    public Rectangle(int width, 
-                int height) {
-        this.width = width;
-        this.height = height;
-    }
-
-    public void setWidth(int width) { 
-        this.width = width; 
-    }
-    public void setHeight(int height) { 
-        this.height = height; 
-    }
-    public int getArea() { 
-        return width * height; 
-    }
-}
-```
-
-</div> 
-<div>
-
-```java
-class Square extends Rectangle {
-    public Square(int side) {
-        this.width = side;
-        this.height = side;
-    }
-
-    @Override
-    public void setWidth(int width) {
-        this.width = width;
-        this.height = width;
-    }
-
-    @Override
-    public void setHeight(int height) {
-        this.width = height;
-        this.height = height;
-    }
-}
-```
-
-</div>
-</div>
-
----
-# Liskov Substitution Principle  - Exemple
-
-```java
-public static void main(String[] args) {
-    Rectangle rect = new Rectangle();
-    rect.setWidth(4);
-    rect.setHeight(5);
-    System.out.println("Rectangle area: " + rect.getArea());  // 4 * 5 = 20
-
-    Rectangle square = new Square();
-    square.setWidth(4);
-    square.setHeight(5);
-
-    System.out.println("Square area: " + square.getArea());  // 5 * 5 = 25 au lieu de 4 * 5
-}
-```
----
-
-# Liskov Substitution Principle  - Exemple
-
-<div class="columns">
-<div>         
-
-```java
-interface Shape {
-    int getArea();
-}
-
-class Rectangle implements Shape {
-    protected int width, height;
-
-    public Rectangle(int width, 
-               int height) {
-
-        this.width = width;
-        this.height = height;
-
-    }
-...
-}
-```
-
-</div> 
-<div>
-
-```java
-
-class Square implements Shape {
-    private int side;
-
-    public Square(int side) { 
-        this.side = side; 
-    }
-    
-    ...
-```
-
-</div>
-</div>
-
----
-
-# Liskov Substitution en lien avec le pattern factory
-
-<div class="columns">
-<div>         
-
-```java
-class ShapeFactory {
-
-    public static Shape createRectangle(
-              int width, int height) {
-        return new Rectangle(width, height);
-    }
-
-    public static Shape createSquare(
-               int side) {
-        return new Square(side);
-    }
-
-}
-```
-
-</div> 
-<div>
-
-La fabrique (**factory**) est un patron de conception créationnel utilisé en programmation orientée objet. 
-
-Elle permet d'instancier des objets dont le type est dérivé d'un type abstrait. 
-
-La **classe exacte** de l'objet n'est donc **pas connue par l'appelant**. 
-
-</div>
-</div>
-
-
----
-# Interface Segregation Principle
-
-Préférer **plusieurs interfaces spécifiques** pour chaque client plutôt qu'une seule interface générale. 
-
-Cela évite aux classes de dépendre de méthodes dont elles n'ont pas besoin, réduisant ainsi les couplages inutiles.
-
----
-
-# Interface Segregation Principle  - Exemple
-
-```java
-interface Worker {
-    void work();
-    void eat();
-}
-
-class Developer implements Worker {
-
-    public void work() {
-        System.out.println("Writing code...");
-    }
-
-    public void eat() {
-        throw new UnsupportedOperationException("Developers don’t eat at work!");
-    }
-}
-```
-
-
-La classe `Developer` ne devrait pas être obligée d’implémenter `eat()`.
-
-
----
-
-# Interface Segregation Principle  - Exemple
-
-<div class="columns">
-<div>         
-
-```java
-interface Workable {
-    void work();
-}
-
-interface Eatable {
-    void eat();
-}
-
-class Developer 
-         implements Workable {
-    public void work() {
-        System.out.println(
-            "Writing code...");
-    }
-}
-```
-
-</div> 
-<div>
-
-```java
-class HumanWorker 
-        implements Workable,
-                      Eatable {
-
-    public void work() {
-        System.out.println(
-            "Working...");
-    }
-
-    public void eat() {
-        System.out.println(
-            "Eating...");
-    }
-}
-```
-
-</div>
-</div>
-
----
-
-# Dependency Inversion Principle
-
-Il faut **dépendre** des **abstractions**, pas des implémentations. 
-
-Cela favorise la modularité, la flexibilité et la réutilisabilité en réduisant les dépendances directes entre les modules.
-
----
-
-# Dependency Inversion Principle  - Exemple
-
-<div class="columns">
-<div>         
-
-```java
-class Keyboard {
-    public String getInput() {
-        return "User input";
-    }
-}
-
-class Computer {
-    private Keyboard keyboard = new Keyboard();
-
-    public void useKeyboard() {
-        System.out.println("Using: " 
-            + keyboard.getInput());
-    }
-}
-```
-
-</div> 
-<div>
-
-```java
-interface InputDevice {
-    String getInput();
-}
-
-class Keyboard implements InputDevice {
-    public String getInput() {
-        return "User input from Keyboard";
-    }
-}
-
-class Computer {
-    private InputDevice inputDevice;
-
-    public Computer(InputDevice inputDevice) {
-        this.inputDevice = inputDevice;
-    }
-
-    public void useInputDevice() {
-        System.out.println("Using: " 
-            + inputDevice.getInput());
-    }
-}
-```
-
-</div>
-</div>
-
----
-
-# Pourquoi appliquer SOLID ?
-
-- **Facilite la maintenance et l’évolutivité**
-- **Réduit le couplage et améliore la réutilisabilité**
-- **Facilite les tests unitaires**
-- **Favorise un code plus clair et modulaire**
-- **Conserver la conformité aux spécifications inchangées**
-
----
-
-# Principle of Least Knowledge - Loi de Demeter
-
-La Loi de Déméter stipule qu'un module ou une classe ne doit interagir qu'avec **ses dépendances directes** et **éviter les chaînes d’appels** profondes.
-
-Une méthode d'un objet ne doit appeler que :
-
-- Ses propres méthodes
-- Les méthodes de ses attributs directs
-- Les méthodes des paramètres qu’elle reçoit
-- Les méthodes de ses propres objets créés
-
----
-# Loi de Demeter - Exemple
-
-```java
-class Address {
-    private String city;
-
-    public Address(String city) {
-        this.city = city;
-    }
-
-    public String getCity() {
-        return city;
-    }
-}
-```
-
----
-# Loi de Demeter - Exemple
-
-`Order` dépend de `Person` **et** de `Address`, le **couplage** est fort.
-
-<div class="columns">
-<div>         
-
-```java
-class Person {
-    private Address address;
-
-    public Person(Address address) {
-        this.address = address;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-}
-```
-
-</div> 
-<div>
-
-```java
-class Order {
-    private Person customer;
-
-    public Order(Person customer) {
-        this.customer = customer;
-    }
-
-    public void printCustomerCity() {
-        System.out.println(
-             customer
-                  .getAddress()
-                         .getCity()); 
-    }
-}
-```
-
-</div>
-</div>
-
----
-
-# Loi de Demeter - Exemple
-
-`Order` ne dépend que de `Person`, ce qui réduit le **couplage**.
-
-<div class="columns">
-<div>         
-
-```java
-class Person {
-    private Address address;
-
-    public Person(Address address) {
-        this.address = address;
-    }
-
-    public String getCity() { 
-        return address.getCity();
-    }
-}
-```
-
-</div> 
-<div>
-
-```java
-class Order {
-    private Person customer;
-
-    public Order(Person customer) {
-        this.customer = customer;
-    }
-
-    public void printCustomerCity() {
-        System.out.println(
-            customer.getCity());
-    }
-}
-```
-
-</div>
-</div>
-
----
-
-# Limites des principes SOLID
-
-## Complexité accrue
-- **Problème :** Appliquer strictement SOLID peut fragmenter le code en trop de petites classes et interfaces, rendant le projet difficile à suivre.  
-- **Solution :** Appliquer SOLID avec bon sens, en évitant une abstraction excessive si elle n’apporte pas de valeur.  
-
-**Exemple :**  
-- Avoir une **interface par type de paiement** (`CreditCardPayment`, `PaypalPayment`, etc.) est utile.  
-- Mais créer une **interface pour chaque méthode** (`ProcessPayment`, `VerifyPayment`, `RefundPayment`) peut être exagéré.
-
----
-
-# Limites des principes SOLID
-
-## Risque de surconception (Overengineering)
-- **Problème :** Trop appliquer **OCP (Ouvert/Fermé)** et **DIP (Dépendance Inversion)** peut mener à des couches d’abstraction inutiles.  
-- **Solution :** Appliquer **KISS** (*Keep It Simple, Stupid*) et introduire des abstractions seulement si nécessaire.
-
-**Exemple :**  
-- Si une **classe concrète suffit** (`FileLogger`), inutile de créer une **interface** (`ILogger`) et plusieurs implémentations si le besoin ne se présente pas encore.
-
----
-
-# Limites des principes SOLID
-
-## Difficulté d’application dans les petits projets
-- **Problème :** Dans un **projet simple**, appliquer SOLID peut être inutilement contraignant et ralentir le développement.  
-- **Solution :** SOLID est plus adapté aux **projets évolutifs**. Dans un petit projet, mieux vaut **prioriser la lisibilité et la simplicité**.
-
-**Exemple :**  
-- Une simple **classe utilitaire** (`MathUtils`) n’a pas besoin d’être fragmentée en plusieurs **interfaces et classes**.
-
----
-# Limites des principes SOLID
-
-## Conclusion : SOLID ≠ dogme absolu
-SOLID **améliore la maintenabilité et la modularité** d’un projet.  
-Mais **trop l’appliquer peut compliquer inutilement le code**.  
-
-### Meilleure approche :
-- **Trouver un équilibre** entre SOLID, lisibilité et simplicité.  
-- Toujours se demander : **"Est-ce que cette abstraction ajoute vraiment de la valeur ?"**  
-
-**SOLID est un outil, pas une règle absolue !**
-
 
 
 ---
@@ -2935,6 +2098,840 @@ Difficultés associées aux tests d'une application
 
 - **Test basé sur l’équivalence** : Regroupez les entrées similaires pour réduire le nombre de cas à tester tout en maintenant une couverture significative.
 - **Tests de frontières** : Testez les cas aux limites des entrées et sorties pour vérifier le bon fonctionnement du système dans les conditions extrêmes.
+
+---
+<!-- _class: transition2 -->  
+
+Principes SOLID</br>
+&</br>
+Design patterns
+
+--- 
+
+<!-- _class: cite -->        
+
+**SOLID** est un ensemble de principes pour améliorer la conception logicielle en **Programmation Orientée Objet**.
+
+---
+
+# Principe SOLID
+
+5 principes introduits par Robert C. Martin
+
+- **S**ingle responsibility principle - Responsabilité unique 
+- **O**pen–closed principle - Ouvert/fermé
+- **L**iskov substitution principle - Substitution de Liskov 
+- **I**nterface segregation principle - Ségrégation des interfaces 
+- **D**ependency inversion principle - Inversion des dépendances
+
+---
+
+# **S**ingle Responsibility Principle - SRP
+
+Une **classe**, une **fonction** ou une **méthode** doit avoir une et une seule **unique** raison d'être modifiée. 
+
+Cela favorise la modularité et facilite la maintenance en évitant les classes surchargées de responsabilités.
+
+---
+# **S**RP - Exemple sur une classe
+
+<div class="columns">
+<div>         
+
+
+```java
+class Report {
+
+    private String content;
+
+    public void generate() {
+        content = "Rapport de ventes\n
+           ================\nTotal: 5000€\n";
+    }
+
+    public void saveToFile(String filename) {
+        try (FileWriter writer 
+                 = new FileWriter(filename)) {
+            writer.write(content);
+            System.out.println("Report saved to " 
+                + filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+</div> 
+<div>
+
+### La classe a deux responsabilités :
+
+1. Générer le rapport (logique métier)
+2. Sauvegarder le fichier (interaction avec le système de fichiers)
+
+</div>
+</div>
+
+---
+# **S**RP - Exemple sur une classe
+
+<div class="columns">
+<div>         
+
+
+```java
+public class FileSaver {
+    public void saveToFile(String data,
+                          String filename) {
+        try (FileWriter writer 
+               = new FileWriter(filename)) {
+            writer.write(data);
+            System.out.println(
+                "Report saved to " 
+                + filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+public class Report {
+    private String content;
+
+    public void generate() {
+        content = "Rapport de ventes\n
+            ================\nTotal: 5000€\n";
+    }
+
+    public String getContent() {
+        return content;
+    }
+}
+```
+</div>
+</div>
+
+- `Report` génère le rapport (logique métier)
+- `FileSaver` sauvegarde le fichier (interaction avec le système de fichiers)
+
+---
+
+# **S**RP en lien avec le pattern Facade
+
+
+<div class="columns">
+<div>         
+
+```java
+public class ReportFacade {
+    private Report report;
+    private FileSaver saver;
+
+    public ReportFacade() {
+        this.report = new Report();
+        this.saver = new FileSaver();
+    }
+
+    public void generateAndSaveReport(
+            String filename) {
+
+        report.generate();
+        saver.saveToFile(
+            report.getContent(),
+                        filename); 
+    }
+}
+```
+
+</div> 
+<div>
+
+Le design pattern Facade fournit une interface simplifiée et unifiée pour **cacher la complexité** d'un sous-système, en **déléguant** les appels aux classes internes sans les exposer directement.
+
+`ReportFacade` **coordonne** les deux services.
+
+</div>
+</div>
+
+---
+
+# **S**RP - Exemple sur une méthode
+
+<div class="columns">
+<div>         
+
+### Deux responsabilités par méthode
+
+```java
+void displayWinner(List<Player> players, 
+         Player currentPlayer) {
+
+    Player winner = currentPlayer;
+
+    for (Player player : players) {
+        if(player.getScore()> 100){
+            winner = player;
+        }
+    }
+
+    System.out.println("Vainqueur : " 
+        + winner.getName());
+}
+```
+
+</div> 
+<div>
+
+### Une responsabilité par méthode
+
+```java
+Player getWinner(List<Player> players, 
+         Player currentPlayer) {
+    Player winner = currentPlayer;
+    for (Player player : players) {
+        if (player.getScore() > 100) {
+            winner = player;
+        }
+    }
+    return winner;
+}
+
+void displayWinner(Player player){
+    System.out.println("Vainqueur : " 
+        + winner.getName());
+}
+```
+
+</div>
+</div>
+
+---
+
+# **O**pen/Closed Principle
+
+Une classe (ou une fonction, un module ...) doit être **fermée** à la **modification** directe mais **ouverte** à l'**extension**. 
+
+L'objectif est de permettre l'ajout de nouvelles fonctionnalités **sans altérer le code existant**.
+
+---
+
+# **O**pen/Closed Principle - Exemple
+
+<div class="columns">
+<div>         
+
+
+```java
+public class PaymentProcessor {
+
+    public void processPayment(String type) {
+
+        if (type.equals("credit_card")) {
+
+            System.out.println(
+               "Processing card payment...");
+
+        } else if (type.equals("payconiq")) {
+
+            System.out.println(
+               "Processing Payconiq payment...");
+               
+        }
+    }
+} 
+```
+
+</div> 
+<div>
+
+Pour ajouter le Bitcoin comme moyen de paiement, il faut modifier `PaymentProcessor`.
+
+Si une classe a été **testée** et **validé**, on ne la **modifie pas**.
+</div>
+</div>
+
+---
+
+# **O**pen/Closed Principle en lien avec le pattern Strategy
+
+<div class="columns">
+<div>         
+
+```java
+interface PaymentStrategy {
+    void pay();
+}
+
+class CreditCardPayment implements PaymentStrategy {
+    public void pay() {
+
+        System.out.println(
+            "Processing credit card payment...");
+
+    }
+}
+
+class PayconiqPayment implements PaymentStrategy {
+    public void pay() {
+
+        System.out.println(
+            "Processing Payconiq payment...");
+
+    }
+}
+```
+
+</div> 
+<div>
+
+Pour ajouter un nouveau moyen de paiement il faut créer une nouvelle implémentation de `PaymentStrategy`.
+
+Le design pattern Strategy permet de définir une **famille d'algorithmes**, de les **encapsuler** et de les **interchanger dynamiquement** sans modifier le code du client, favorisant ainsi l'extensibilité.
+</div>
+</div>
+
+---
+
+# **O**pen/Closed Principle en lien avec le pattern Strategy
+
+<div class="columns">
+<div>         
+
+```java
+public class PaymentProcessor {
+    private PaymentStrategy strategy;
+
+    public PaymentProcessor(
+             PaymentStrategy strategy) {
+
+        this.strategy = strategy;
+    }
+
+    public void processPayment() {
+        strategy.pay();
+    }
+
+    public void setStrategy(
+            PaymentStrategy strategy) {
+        this.strategy = strategy;
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+public static void main(String[] args) {
+
+    CreditCardPayment cardStrategy
+            = new CreditCardPayment();
+
+    PaymentProcessor processor
+            = new PaymentProcessor(
+                cardStrategy);
+
+    processor.processPayment();
+
+    PayconiqPayment payconiqStrategy
+            = new PayconiqPayment();
+
+    processor.setStrategy(payconiqStrategy);
+
+    processor.processPayment();
+}
+```
+</div>
+</div>
+
+
+---
+
+# Liskov Substitution Principle 
+
+Une instance de type T doit pouvoir être remplacée par une instance de type G, tel que G sous-type de T, sans que cela ne modifie la cohérence du programme. 
+Cela garantit que les sous-classes peuvent être utilisées de manière interchangeable avec leurs classes de base.
+
+L'extension d'une classe **ne doit pas modifier le comportement attendu des méthodes remplacées**.
+
+---
+
+# Liskov Substitution Principle  - Exemple
+
+<div class="columns">
+<div>         
+
+```java
+class Rectangle {
+    protected int width, height;
+
+    public Rectangle(int width, 
+                int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    public void setWidth(int width) { 
+        this.width = width; 
+    }
+    public void setHeight(int height) { 
+        this.height = height; 
+    }
+    public int getArea() { 
+        return width * height; 
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+class Square extends Rectangle {
+    public Square(int side) {
+        this.width = side;
+        this.height = side;
+    }
+
+    @Override
+    public void setWidth(int width) {
+        this.width = width;
+        this.height = width;
+    }
+
+    @Override
+    public void setHeight(int height) {
+        this.width = height;
+        this.height = height;
+    }
+}
+```
+
+</div>
+</div>
+
+---
+# Liskov Substitution Principle  - Exemple
+
+```java
+public static void main(String[] args) {
+    Rectangle rect = new Rectangle();
+    rect.setWidth(4);
+    rect.setHeight(5);
+    System.out.println("Rectangle area: " + rect.getArea());  // 4 * 5 = 20
+
+    Rectangle square = new Square();
+    square.setWidth(4);
+    square.setHeight(5);
+
+    System.out.println("Square area: " + square.getArea());  // 5 * 5 = 25 au lieu de 4 * 5
+}
+```
+---
+
+# Liskov Substitution Principle  - Exemple
+
+<div class="columns">
+<div>         
+
+```java
+interface Shape {
+    int getArea();
+}
+
+class Rectangle implements Shape {
+    protected int width, height;
+
+    public Rectangle(int width, 
+               int height) {
+
+        this.width = width;
+        this.height = height;
+
+    }
+...
+}
+```
+
+</div> 
+<div>
+
+```java
+
+class Square implements Shape {
+    private int side;
+
+    public Square(int side) { 
+        this.side = side; 
+    }
+    
+    ...
+```
+
+</div>
+</div>
+
+---
+
+# Liskov Substitution en lien avec le pattern factory
+
+<div class="columns">
+<div>         
+
+```java
+class ShapeFactory {
+
+    public static Shape createRectangle(
+              int width, int height) {
+        return new Rectangle(width, height);
+    }
+
+    public static Shape createSquare(
+               int side) {
+        return new Square(side);
+    }
+
+}
+```
+
+</div> 
+<div>
+
+La fabrique (**factory**) est un patron de conception créationnel utilisé en programmation orientée objet. 
+
+Elle permet d'instancier des objets dont le type est dérivé d'un type abstrait. 
+
+La **classe exacte** de l'objet n'est donc **pas connue par l'appelant**. 
+
+</div>
+</div>
+
+
+---
+# Interface Segregation Principle
+
+Préférer **plusieurs interfaces spécifiques** pour chaque client plutôt qu'une seule interface générale. 
+
+Cela évite aux classes de dépendre de méthodes dont elles n'ont pas besoin, réduisant ainsi les couplages inutiles.
+
+---
+
+# Interface Segregation Principle  - Exemple
+
+```java
+interface Worker {
+    void work();
+    void eat();
+}
+
+class Developer implements Worker {
+
+    public void work() {
+        System.out.println("Writing code...");
+    }
+
+    public void eat() {
+        throw new UnsupportedOperationException("Developers don’t eat at work!");
+    }
+}
+```
+
+
+La classe `Developer` ne devrait pas être obligée d’implémenter `eat()`.
+
+
+---
+
+# Interface Segregation Principle  - Exemple
+
+<div class="columns">
+<div>         
+
+```java
+interface Workable {
+    void work();
+}
+
+interface Eatable {
+    void eat();
+}
+
+class Developer 
+         implements Workable {
+    public void work() {
+        System.out.println(
+            "Writing code...");
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+class HumanWorker 
+        implements Workable,
+                      Eatable {
+
+    public void work() {
+        System.out.println(
+            "Working...");
+    }
+
+    public void eat() {
+        System.out.println(
+            "Eating...");
+    }
+}
+```
+
+</div>
+</div>
+
+---
+
+# Dependency Inversion Principle
+
+Il faut **dépendre** des **abstractions**, pas des implémentations. 
+
+Cela favorise la modularité, la flexibilité et la réutilisabilité en réduisant les dépendances directes entre les modules.
+
+---
+
+# Dependency Inversion Principle  - Exemple
+
+<div class="columns">
+<div>         
+
+```java
+class Keyboard {
+    public String getInput() {
+        return "User input";
+    }
+}
+
+class Computer {
+    private Keyboard keyboard = new Keyboard();
+
+    public void useKeyboard() {
+        System.out.println("Using: " 
+            + keyboard.getInput());
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+interface InputDevice {
+    String getInput();
+}
+
+class Keyboard implements InputDevice {
+    public String getInput() {
+        return "User input from Keyboard";
+    }
+}
+
+class Computer {
+    private InputDevice inputDevice;
+
+    public Computer(InputDevice inputDevice) {
+        this.inputDevice = inputDevice;
+    }
+
+    public void useInputDevice() {
+        System.out.println("Using: " 
+            + inputDevice.getInput());
+    }
+}
+```
+
+</div>
+</div>
+
+---
+
+# Pourquoi appliquer SOLID ?
+
+- **Facilite la maintenance et l’évolutivité**
+- **Réduit le couplage et améliore la réutilisabilité**
+- **Facilite les tests unitaires**
+- **Favorise un code plus clair et modulaire**
+- **Conserver la conformité aux spécifications inchangées**
+
+---
+
+# Principle of Least Knowledge - Loi de Demeter
+
+La Loi de Déméter stipule qu'un module ou une classe ne doit interagir qu'avec **ses dépendances directes** et **éviter les chaînes d’appels** profondes.
+
+Une méthode d'un objet ne doit appeler que :
+
+- Ses propres méthodes
+- Les méthodes de ses attributs directs
+- Les méthodes des paramètres qu’elle reçoit
+- Les méthodes de ses propres objets créés
+
+---
+# Loi de Demeter - Exemple
+
+```java
+class Address {
+    private String city;
+
+    public Address(String city) {
+        this.city = city;
+    }
+
+    public String getCity() {
+        return city;
+    }
+}
+```
+
+---
+# Loi de Demeter - Exemple
+
+`Order` dépend de `Person` **et** de `Address`, le **couplage** est fort.
+
+<div class="columns">
+<div>         
+
+```java
+class Person {
+    private Address address;
+
+    public Person(Address address) {
+        this.address = address;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+class Order {
+    private Person customer;
+
+    public Order(Person customer) {
+        this.customer = customer;
+    }
+
+    public void printCustomerCity() {
+        System.out.println(
+             customer
+                  .getAddress()
+                         .getCity()); 
+    }
+}
+```
+
+</div>
+</div>
+
+---
+
+# Loi de Demeter - Exemple
+
+`Order` ne dépend que de `Person`, ce qui réduit le **couplage**.
+
+<div class="columns">
+<div>         
+
+```java
+class Person {
+    private Address address;
+
+    public Person(Address address) {
+        this.address = address;
+    }
+
+    public String getCity() { 
+        return address.getCity();
+    }
+}
+```
+
+</div> 
+<div>
+
+```java
+class Order {
+    private Person customer;
+
+    public Order(Person customer) {
+        this.customer = customer;
+    }
+
+    public void printCustomerCity() {
+        System.out.println(
+            customer.getCity());
+    }
+}
+```
+
+</div>
+</div>
+
+---
+
+# Limites des principes SOLID
+
+## Complexité accrue
+- **Problème :** Appliquer strictement SOLID peut fragmenter le code en trop de petites classes et interfaces, rendant le projet difficile à suivre.  
+- **Solution :** Appliquer SOLID avec bon sens, en évitant une abstraction excessive si elle n’apporte pas de valeur.  
+
+**Exemple :**  
+- Avoir une **interface par type de paiement** (`CreditCardPayment`, `PaypalPayment`, etc.) est utile.  
+- Mais créer une **interface pour chaque méthode** (`ProcessPayment`, `VerifyPayment`, `RefundPayment`) peut être exagéré.
+
+---
+
+# Limites des principes SOLID
+
+## Risque de surconception (Overengineering)
+- **Problème :** Trop appliquer **OCP (Ouvert/Fermé)** et **DIP (Dépendance Inversion)** peut mener à des couches d’abstraction inutiles.  
+- **Solution :** Appliquer **KISS** (*Keep It Simple, Stupid*) et introduire des abstractions seulement si nécessaire.
+
+**Exemple :**  
+- Si une **classe concrète suffit** (`FileLogger`), inutile de créer une **interface** (`ILogger`) et plusieurs implémentations si le besoin ne se présente pas encore.
+
+---
+
+# Limites des principes SOLID
+
+## Difficulté d’application dans les petits projets
+- **Problème :** Dans un **projet simple**, appliquer SOLID peut être inutilement contraignant et ralentir le développement.  
+- **Solution :** SOLID est plus adapté aux **projets évolutifs**. Dans un petit projet, mieux vaut **prioriser la lisibilité et la simplicité**.
+
+**Exemple :**  
+- Une simple **classe utilitaire** (`MathUtils`) n’a pas besoin d’être fragmentée en plusieurs **interfaces et classes**.
+
+---
+# Limites des principes SOLID
+
+## Conclusion : SOLID ≠ dogme absolu
+SOLID **améliore la maintenabilité et la modularité** d’un projet.  
+Mais **trop l’appliquer peut compliquer inutilement le code**.  
+
+### Meilleure approche :
+- **Trouver un équilibre** entre SOLID, lisibilité et simplicité.  
+- Toujours se demander : **"Est-ce que cette abstraction ajoute vraiment de la valeur ?"**  
+
+**SOLID est un outil, pas une règle absolue !**
 
 ---
 
