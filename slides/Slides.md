@@ -1683,7 +1683,7 @@ public double calculateTotal(Order order) {
 
 - Méthode ayant **trop de responsabilités**.
 - Tests unitaires difficiles à **isoler**.
-- La maintenance devient un cauchemar.
+<!-- - La maintenance devient un cauchemar. -->
 - Solution, introduire les méthodes : 
     - `double calculateItemsTotal(Order order)`
     - `double applyDiscount(Order order, double total)`
@@ -1905,7 +1905,7 @@ La **couverture de tests** mesure le pourcentage de code exécuté lors des test
 La couverture à 100% **ne garantit pas un code sans erreur**. Il reste important de tester des cas d'usage réels et des scénarios non triviaux pour garantir la robustesse du code.
 
 ---
-# Couverture de tests : Tests en boite noire ou boite blanche
+# Couverture de tests : Tests en boite noire ou blanche
 
 ```java
 public class PasswordValidator {
