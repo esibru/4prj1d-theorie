@@ -2304,7 +2304,7 @@ Player getWinner(List<Player> players,
 
 void displayWinner(Player player){
     System.out.println("Vainqueur : " 
-        + winner.getName());
+        + getWinner().getName());
 }
 ```
 
